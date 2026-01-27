@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Stress-Strain Curve</title>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; background-color: #f3f4f6; }
+    h1 { color: #1f2937; text-align: center; }
+    #curve { width: 100%; max-width: 800px; height: 500px; margin: auto; }
+    a { color: #4f46e5; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<h1>Stress-Strain Curve</h1>
+<div id="curve"></div>
+<p style="text-align:center;"><a href="index.html">← Back to Home</a></p>
+
+<script>
+  // Stress and strain values (example, linear + plastic)
+  const strain = [0, 0.001, 0.002, 0.003, 0.004, 0.006, 0.008, 0.01, 0.012, 0.015, 0.02];
+  const stress = [0, 50, 100, 150, 200, 250, 300, 350, 375, 375, 350];
+
+  const data = [{
+    x: strain,
+    y: stress,
+    mode: 'lines+markers',
+    marker: { size: 8, color: 'red' },
+    text: [
+      'Origin',
+      'Elastic Region',
+      'Elastic Region',
+      'Elastic Region',
+      'Proportional Limit',
+      'Yield Strength',
+      'Ultimate Strength',
+      'Necking',
+      'Fracture',
+      'Post-fracture',
+      'Fracture complete'
+    ],
+    hoverinfo: 'text+y+x'
+  }];
+
+  const layout = {
+    title: 'Interactive Stress-Strain Curve',
+    xaxis: { title: 'Strain (ε)' },
+    yaxis: { title: 'Stress (MPa)' },
+    hovermode: 'closest'
+  };
+
+  Plotly.newPlot('curve', data, layout);
+
+  // Make points clickable
+  const curveDiv = document.getElementById('curve');
+  curveDiv.on('plotly_click', function(data){
+    const point = data.points[0];
+    const message = `You clicked: ${point.text}\nStress: ${point.y} MPa\nStrain: ${point.x}`;
+    alert(message);
+  });
+</script>
+
+</body>
+</html>
