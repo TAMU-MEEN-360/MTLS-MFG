@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MEEN 360 Fluids Review</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f3f4f6;
+    }
+    h1 {
+      margin-top: 30px;
+      color: #1f2937;
+    }
+    .bubble-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 50px;
+      gap: 40px;
+    }
+    .bubble {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background-color: #4f46e5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.2s;
+      text-decoration: none;
+    }
+    .bubble:hover {
+      transform: scale(1.1);
+      background-color: #6366f1;
+    }
+  </style>
+</head>
+<body>
+
+<h1>MEEN 360 Fluids Review</h1>
+<p>Click a topic to go to the detailed page</p>
+
+<div class="bubble-container">
+  <a href="fluid-properties.html" class="bubble">Fluid Properties</a>
+  <a href="fluid-statics.html" class="bubble">Fluid Statics</a>
+  <a href="fluid-dynamics.html" class="bubble">Fluid Dynamics</a>
+  <a href="control-volume.html" class="bubble">Control Volume Analysis</a>
+  <a href="applications.html" class="bubble">Applications</a>
+</div>
+
+</body>
+</html>
