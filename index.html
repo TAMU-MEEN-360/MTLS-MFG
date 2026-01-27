@@ -125,5 +125,35 @@
 
 </div>
 
+<script>
+  const group = document.querySelector('.bubble-group');
+  const mainBubble = group.querySelector('.bubble.main');
+  const nestedBubbles = group.querySelectorAll('.nested-bubbles .bubble');
+
+  const svg = group.querySelector('.line-layer');
+  svg.innerHTML = ''; // clear any existing lines
+
+  nestedBubbles.forEach(bubble => {
+    const mainRect = mainBubble.getBoundingClientRect();
+    const nestedRect = bubble.getBoundingClientRect();
+
+    // Compute coordinates relative to SVG
+    const svgRect = svg.getBoundingClientRect();
+    const x1 = mainRect.left + mainRect.width/2 - svgRect.left;
+    const y1 = mainRect.top + mainRect.height/2 - svgRect.top;
+    const x2 = nestedRect.left + nestedRect.width/2 - svgRect.left;
+    const y2 = nestedRect.top + nestedRect.height/2 - svgRect.top;
+
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1', x1);
+    line.setAttribute('y1', y1);
+    line.setAttribute('x2', x2);
+    line.setAttribute('y2', y2);
+    line.setAttribute('stroke', '#1f2937');
+    line.setAttribute('stroke-width', '2');
+    svg.appendChild(line);
+  });
+</script>
+
 </body>
 </html>
