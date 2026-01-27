@@ -54,6 +54,11 @@
       transform: scale(1.1);
       background-color: #6366f1;
     }
+    .bubble.main:hover {
+  transform: none;       /* prevent scaling */
+  background-color: #10b981; /* keep original green */
+  cursor: default;       /* shows it’s not clickable */
+}
 
     /* Main Material Properties bubble bigger */
     .bubble.main {
