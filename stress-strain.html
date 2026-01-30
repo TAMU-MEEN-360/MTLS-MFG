@@ -1,64 +1,383 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Stress-Strain Curve</title>
+  <meta charset="UTF-8" />
+  <title>ASTM A36 Steel Stress–Strain (Interactive)</title>
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; margin: 40px; background-color: #f3f4f6; }
-    h1 { color: #1f2937; text-align: center; }
-    #curve { width: 100%; max-width: 800px; height: 500px; margin: auto; }
+    body { font-family: Arial, sans-serif; margin: 40px; background: #f3f4f6; color: #111827; }
+    h1 { text-align: center; margin: 0 0 6px; }
+    .subtitle { text-align:center; margin: 0 0 14px; color: #374151; }
+    #curve { width: 100%; max-width: 950px; height: 600px; margin: 0 auto 14px; }
     a { color: #4f46e5; text-decoration: none; }
     a:hover { text-decoration: underline; }
+
+    /* Modal */
+    .modal-backdrop {
+      display: none; position: fixed; inset: 0;
+      background: rgba(17,24,39,0.55);
+      z-index: 50; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .modal {
+      background: white; width: min(720px, 100%);
+      border-radius: 14px; overflow: hidden;
+      box-shadow: 0 18px 45px rgba(0,0,0,0.25);
+    }
+    .modal-header {
+      background: #111827; color: white;
+      padding: 14px 16px; display: flex; justify-content: space-between; align-items: center;
+      gap: 12px;
+    }
+    .modal-header h2 { margin: 0; font-size: 16px; font-weight: 700; }
+    .close-btn {
+      border: none; background: rgba(255,255,255,0.15);
+      color: white; padding: 6px 10px; border-radius: 10px;
+      cursor: pointer; font-size: 14px;
+    }
+    .close-btn:hover { background: rgba(255,255,255,0.25); }
+    .modal-body { padding: 16px; line-height: 1.45; }
+    .kv { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; font-size: 14px; }
+    .pill { display: inline-block; background: #e5e7eb; border-radius: 999px; padding: 3px 10px; font-size: 12px; margin-right: 6px; margin-top: 4px; }
+    .note { margin-top: 10px; font-size: 13px; color: #374151; }
+    .footer { text-align:center; margin-top: 8px; }
   </style>
 </head>
 <body>
 
-<h1>Stress-Strain Curve</h1>
+<h1>ASTM A36 Steel — Stress–Strain Curve (Interactive)</h1>
+<p class="subtitle">Click labeled points (and the shaded resilience region) to learn each property.</p>
+
 <div id="curve"></div>
-<p style="text-align:center;"><a href="index.html">← Back to Home</a></p>
+<div class="footer"><a href="index.html">← Back to Home</a></div>
+
+<!-- Modal -->
+<div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modalTitle">Title</h2>
+      <button class="close-btn" id="closeModal">Close</button>
+    </div>
+    <div class="modal-body">
+      <div id="modalContent"></div>
+      <div class="kv" id="modalKV"></div>
+      <div class="note" id="modalNote"></div>
+    </div>
+  </div>
+</div>
 
 <script>
-  // Stress and strain values (example, linear + plastic)
-  const strain = [0, 0.001, 0.002, 0.003, 0.004, 0.006, 0.008, 0.01, 0.012, 0.015, 0.02];
-  const stress = [0, 50, 100, 150, 200, 250, 300, 350, 375, 375, 350];
-
-  const data = [{
-    x: strain,
-    y: stress,
-    mode: 'lines+markers',
-    marker: { size: 8, color: 'red' },
-    text: [
-      'Origin',
-      'Elastic Region',
-      'Elastic Region',
-      'Elastic Region',
-      'Proportional Limit',
-      'Yield Strength',
-      'Ultimate Strength',
-      'Necking',
-      'Fracture',
-      'Post-fracture',
-      'Fracture complete'
-    ],
-    hoverinfo: 'text+y+x'
-  }];
-
-  const layout = {
-    title: 'Interactive Stress-Strain Curve',
-    xaxis: { title: 'Strain (ε)' },
-    yaxis: { title: 'Stress (MPa)' },
-    hovermode: 'closest'
+  // -----------------------------
+  // ASTM A36 steel (typical, illustrative engineering stress-strain)
+  // Not a datasheet plot—values are representative for teaching.
+  // -----------------------------
+  const steel = {
+    name: "ASTM A36 Steel",
+    E_MPa: 200000,     // 200 GPa
+    sigma_y_MPa: 250,  // ~36 ksi ≈ 250 MPa (minimum yield)
+    sigma_uts_MPa: 430 // choose a reasonable typical example
   };
 
-  Plotly.newPlot('curve', data, layout);
+  const E = steel.E_MPa;
+  const sigma_y = steel.sigma_y_MPa;
+  const sigma_uts = steel.sigma_uts_MPa;
 
-  // Make points clickable
+  // Proportional limit (often slightly below yield)
+  const eps_prop = 0.0011;              // chosen so sigma ~ 220 MPa
+  const sigma_prop = E * eps_prop;
+
+  // Elastic strain at yield:
+  const eps_y_elastic = sigma_y / E;    // ~0.00125
+
+  // Curve points (engineering) with mild plateau and strain hardening, then necking to fracture
+  const curve = [
+    { eps: 0.0000, sig: 0 },
+    { eps: 0.0006, sig: E * 0.0006 },          // 120 MPa
+    { eps: eps_prop, sig: sigma_prop },        // proportional limit
+    { eps: eps_y_elastic, sig: sigma_y },      // yield (approx)
+    { eps: 0.0100, sig: sigma_y + 5 },         // small yield plateau / Lüders-like
+    { eps: 0.0300, sig: 310 },
+    { eps: 0.0700, sig: 380 },
+    { eps: 0.1200, sig: sigma_uts },           // UTS (necking begins here on engineering curve)
+    { eps: 0.1800, sig: 410 },                 // necking region (engineering stress drops)
+    { eps: 0.2500, sig: 340 }                  // fracture (end of curve)
+  ];
+
+  // Fracture point = last point
+  const fracture = curve[curve.length - 1];
+
+  // 0.2% offset line: sigma = E*(eps - 0.002), for eps >= 0.002
+  const offsetX = [];
+  const offsetY = [];
+  for (let eps = 0.0; eps <= 0.035; eps += 0.0005) {
+    const sig = E * (eps - 0.002);
+    if (sig >= 0) {
+      offsetX.push(eps);
+      offsetY.push(sig);
+    }
+  }
+
+  // Modulus of resilience: area under elastic region up to yield
+  // U_r = sigma_y^2/(2E)
+  const U_r = (sigma_y * sigma_y) / (2 * E); // MPa (numerically = MJ/m^3)
+
+  // Shaded region polygon for resilience triangle (0 -> yield)
+  const resX = [0, eps_y_elastic, 0];
+  const resY = [0, sigma_y, 0];
+
+  // -----------------------------
+  // Clickable items (markers)
+  // -----------------------------
+  const clickItems = [
+    {
+      name: "Modulus of Elasticity (E)",
+      x: 0.00075,
+      y: E * 0.00075,
+      title: "Modulus of Elasticity, E (Slope of the elastic region)",
+      content: `
+        In the elastic region, stress and strain are proportional:
+        <br><br><b>σ = E·ε</b>
+        <br><br>The <b>slope</b> of the initial straight line is <b>E</b>.
+      `,
+      kv: {
+        "Material": steel.name,
+        "E (typical)": "200 GPa",
+        "Meaning": "Stiffness (resistance to elastic deformation)"
+      },
+      note: "Unload anywhere in the elastic region → the material returns to original length."
+    },
+    {
+      name: "Proportional Limit",
+      x: eps_prop,
+      y: sigma_prop,
+      title: "Proportional Limit",
+      content: `
+        The proportional limit is the highest point where the curve remains perfectly linear.
+        <br><br>Beyond this, the stress–strain relationship is no longer strictly proportional.
+      `,
+      kv: {
+        "Approx. ε": eps_prop.toFixed(4),
+        "Approx. σ": Math.round(sigma_prop) + " MPa",
+        "Note": "Often slightly below yield"
+      },
+      note: "It can be hard to detect precisely, so the 0.2% offset yield method is commonly used."
+    },
+    {
+      name: "Yield Strength (σy)",
+      x: eps_y_elastic,
+      y: sigma_y,
+      title: "Yield Strength, σy (A36 minimum yield)",
+      content: `
+        Yield strength is where permanent (plastic) deformation begins.
+        <br><br>For A36 steel, a common reference is <b>σ<sub>y</sub> ≈ 250 MPa</b> (≈36 ksi minimum).
+      `,
+      kv: {
+        "σy (A36)": sigma_y + " MPa",
+        "Elastic strain at σy": eps_y_elastic.toFixed(5),
+        "What changes": "Plastic strain begins"
+      },
+      note: "Design often limits stress below yield to avoid permanent set."
+    },
+    {
+      name: "0.2% Offset Yield Method",
+      x: 0.0035,
+      y: E * (0.0035 - 0.002),
+      title: "0.2% Offset Line",
+      content: `
+        The <b>0.2% offset method</b> defines yield consistently for many metals.
+        <br><br>Draw a line with slope <b>E</b> starting at <b>ε = 0.002</b> (0.2% strain).
+        <br>The intersection with the curve defines the <b>offset yield strength</b>.
+      `,
+      kv: {
+        "Offset": "ε = 0.002",
+        "Line slope": "E",
+        "Why used": "Consistent yield definition"
+      },
+      note: "On this plot, the dashed line is the 0.2% offset line."
+    },
+    {
+      name: "Ultimate Tensile Strength (UTS)",
+      x: 0.1200,
+      y: sigma_uts,
+      title: "Ultimate Tensile Strength (UTS) — Necking starts here",
+      content: `
+        UTS is the <b>maximum engineering stress</b> on the stress–strain curve.
+        <br><br><b>Necking begins at UTS</b> for an engineering stress–strain curve:
+        beyond this point, deformation localizes (cross-sectional area shrinks in one region).
+        <br><br>Because engineering stress uses the <b>original area</b> (A<sub>0</sub>),
+        the plotted stress typically <b>drops after UTS</b> even though the local (true) stress
+        in the neck can continue to rise.
+      `,
+      kv: {
+        "UTS (example)": sigma_uts + " MPa",
+        "Necking begins": "At/just after UTS",
+        "After UTS": "Engineering stress decreases"
+      },
+      note: "Key idea: UTS marks the transition from uniform plastic deformation → localized deformation (necking)."
+    },
+    {
+      name: "Fracture",
+      x: fracture.eps,
+      y: fracture.sig,
+      title: "Fracture (End of the curve)",
+      content: `
+        <b>Fracture</b> is the final failure point of the specimen.
+        <br><br>On an engineering curve, the fracture point comes after the necking region.
+        The stress value shown here is the <b>engineering fracture stress</b>
+        (based on original area A<sub>0</sub>), which is usually lower than UTS.
+      `,
+      kv: {
+        "ε at fracture (example)": fracture.eps.toFixed(3),
+        "σ at fracture (example)": Math.round(fracture.sig) + " MPa",
+        "Occurs after": "Necking"
+      },
+      note: "Fracture strain depends strongly on ductility, temperature, defects, and strain rate."
+    }
+  ];
+
+  // -----------------------------
+  // Traces
+  // -----------------------------
+  const baseCurveTrace = {
+    x: curve.map(p => p.eps),
+    y: curve.map(p => p.sig),
+    mode: 'lines',
+    name: 'A36 Steel (Illustrative)',
+    line: { width: 4 },
+    hoverinfo: 'skip'
+  };
+
+  const offsetTrace = {
+    x: offsetX,
+    y: offsetY,
+    mode: 'lines',
+    name: '0.2% Offset Line',
+    line: { dash: 'dash', width: 2 },
+    hoverinfo: 'skip'
+  };
+
+  // Shade resilience region (clickable)
+  const resilienceTrace = {
+    x: resX,
+    y: resY,
+    mode: 'lines',
+    fill: 'toself',
+    name: 'Modulus of Resilience (Elastic Energy/Volume)',
+    line: { width: 1 },
+    opacity: 0.35,
+    hovertemplate: '<b>Modulus of Resilience</b><br>Uᵣ ≈ %{customdata} MPa (≈ MJ/m³)<extra></extra>',
+    customdata: [U_r.toFixed(4), U_r.toFixed(4), U_r.toFixed(4)]
+  };
+
+  const clickableTrace = {
+    x: clickItems.map(d => d.x),
+    y: clickItems.map(d => d.y),
+    mode: 'markers+text',
+    name: 'Click Labels',
+    marker: { size: 10 },
+    text: clickItems.map(d => d.name),
+    textposition: 'top center',
+    hovertemplate: '<b>%{text}</b><br>σ: %{y:.0f} MPa<br>ε: %{x:.5f}<extra></extra>',
+    customdata: clickItems.map(d => ({
+      title: d.title, content: d.content, kv: d.kv, note: d.note
+    }))
+  };
+
+  const layout = {
+    title: 'Engineering Stress–Strain (ASTM A36 Steel)',
+    xaxis: { title: 'Strain, ε (in/in)', rangemode: 'tozero', gridcolor: '#e5e7eb' },
+    yaxis: { title: 'Stress, σ (MPa)', rangemode: 'tozero', gridcolor: '#e5e7eb' },
+    legend: { orientation: 'h', y: -0.2 },
+    margin: { t: 60, r: 30, b: 90, l: 70 },
+    annotations: [
+      {
+        x: 0.0010, y: 200,
+        text: 'Elastic slope = E',
+        showarrow: true, arrowhead: 2,
+        ax: 60, ay: -40
+      },
+      {
+        x: eps_y_elastic, y: sigma_y,
+        text: 'σy',
+        showarrow: true, arrowhead: 2,
+        ax: 30, ay: -50
+      },
+      {
+        x: 0.12, y: sigma_uts,
+        text: 'UTS / Necking starts',
+        showarrow: true, arrowhead: 2,
+        ax: 35, ay: -55
+      },
+      {
+        x: fracture.eps, y: fracture.sig,
+        text: 'Fracture',
+        showarrow: true, arrowhead: 2,
+        ax: -45, ay: -45
+      }
+    ]
+  };
+
+  Plotly.newPlot('curve', [resilienceTrace, baseCurveTrace, offsetTrace, clickableTrace], layout, { responsive: true });
+
+  // -----------------------------
+  // Modal logic
+  // -----------------------------
+  const backdrop = document.getElementById('modalBackdrop');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalContent = document.getElementById('modalContent');
+  const modalKV = document.getElementById('modalKV');
+  const modalNote = document.getElementById('modalNote');
+  const closeBtn = document.getElementById('closeModal');
+
+  function openModal(payload) {
+    modalTitle.textContent = payload.title;
+    modalContent.innerHTML = payload.content;
+
+    modalKV.innerHTML = '';
+    Object.entries(payload.kv || {}).forEach(([k, v]) => {
+      const div = document.createElement('div');
+      div.innerHTML = `<span class="pill">${k}</span><b>${v}</b>`;
+      modalKV.appendChild(div);
+    });
+
+    modalNote.textContent = payload.note || '';
+    backdrop.style.display = 'flex';
+  }
+  function closeModal() { backdrop.style.display = 'none'; }
+  closeBtn.addEventListener('click', closeModal);
+  backdrop.addEventListener('click', (e) => { if (e.target === backdrop) closeModal(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+  // Click handler: handles marker clicks AND the shaded resilience region
   const curveDiv = document.getElementById('curve');
-  curveDiv.on('plotly_click', function(data){
-    const point = data.points[0];
-    const message = `You clicked: ${point.text}\nStress: ${point.y} MPa\nStrain: ${point.x}`;
-    alert(message);
+  curveDiv.on('plotly_click', function(ev) {
+    const pt = ev.points[0];
+    if (!pt) return;
+
+    // Labeled marker clicks
+    if (pt.customdata && typeof pt.customdata === 'object' && pt.customdata.title) {
+      openModal(pt.customdata);
+      return;
+    }
+
+    // Resilience region click
+    const traceName = pt.data && pt.data.name ? pt.data.name : '';
+    if (traceName.includes('Modulus of Resilience')) {
+      openModal({
+        title: "Modulus of Resilience, Uᵣ (Elastic energy per unit volume)",
+        content: `
+          The <b>modulus of resilience</b> is the energy absorbed per unit volume up to yielding.
+          <br><br>It equals the <b>area under the elastic portion</b> of the stress–strain curve:
+          <br><br><b>Uᵣ = ∫σ dε = σy² / (2E)</b>
+        `,
+        kv: {
+          "σy": sigma_y + " MPa",
+          "E": "200 GPa",
+          "Uᵣ (computed)": U_r.toFixed(4) + " MPa (≈ MJ/m³)"
+        },
+        note: "Numerically, 1 MPa = 1 MJ/m³, so the units match conveniently."
+      });
+    }
   });
 </script>
 
