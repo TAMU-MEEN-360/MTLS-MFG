@@ -12,84 +12,40 @@
       background-color: #f3f4f6;
       color: #111827;
     }
-    h1 {
+    h1 { text-align: center; margin-bottom: 6px; }
+    p  { text-align: center; color: #374151; margin-top: 0; }
+
+    .plot-wrap {
+      max-width: 1050px;
+      margin: 0 auto 22px;
+      background: white;
+      border-radius: 14px;
+      padding: 18px 18px 10px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+    .plot-title {
       text-align: center;
-      margin-bottom: 5px;
+      font-weight: 700;
+      margin: 0 0 10px;
+      color: #111827;
     }
-    p {
-      text-align: center;
-      color: #374151;
-    }
-    #curve {
-      max-width: 1000px;
-      height: 600px;
-      margin: auto;
-    }
+    #curveMain { width: 100%; height: 560px; }
+    #curveZoom { width: 100%; height: 520px; }
+
     a {
       display: block;
       text-align: center;
-      margin-top: 15px;
+      margin-top: 18px;
       color: #4f46e5;
       text-decoration: none;
     }
-    a:hover {
-      text-decoration: underline;
-    }
+    a:hover { text-decoration: underline; }
 
-    /* Modal styling */
-    .modal-backdrop {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.55);
-      justify-content: center;
-      align-items: center;
-      z-index: 10;
-    }
-    .modal {
-      background: white;
-      width: 700px;
-      max-width: 95%;
-      border-radius: 12px;
-      overflow: hidden;
-    }
-    .modal-header {
-      background: #111827;
-      color: white;
-      padding: 12px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .modal-header h2 {
-      font-size: 16px;
-      margin: 0;
-    }
-    .close-btn {
-      background: rgba(255,255,255,0.2);
-      border: none;
-      color: white;
-      padding: 6px 10px;
-      cursor: pointer;
-      border-radius: 6px;
-    }
-    .modal-body {
-      padding: 16px;
-      line-height: 1.45;
-    }
-    .kv {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 10px;
-      font-size: 14px;
-    }
-    .pill {
-      background: #e5e7eb;
-      border-radius: 999px;
-      padding: 3px 10px;
-      font-size: 12px;
-      margin-right: 6px;
+    .hint {
+      font-size: 13px;
+      text-align: center;
+      color: #6b7280;
+      margin: 10px 0 0;
     }
   </style>
 </head>
@@ -97,192 +53,245 @@
 <body>
 
 <h1>Engineering Stress–Strain (ASTM A36 Steel)</h1>
-<p>Click key points or shaded regions to learn what each part represents.</p>
+<p>Quiz yourself: hover over points/regions to reveal what they represent.</p>
 
-<div id="curve"></div>
-<a href="index.html">← Back to Home</a>
-
-<!-- Modal -->
-<div class="modal-backdrop" id="modalBackdrop">
-  <div class="modal">
-    <div class="modal-header">
-      <h2 id="modalTitle"></h2>
-      <button class="close-btn" onclick="closeModal()">Close</button>
-    </div>
-    <div class="modal-body">
-      <div id="modalContent"></div>
-      <div class="kv" id="modalKV"></div>
-    </div>
-  </div>
+<div class="plot-wrap">
+  <div class="plot-title">Full View</div>
+  <div id="curveMain"></div>
+  <div class="hint">Tip: use the zoom tools (top-right of plot) to zoom/pan.</div>
 </div>
+
+<div class="plot-wrap">
+  <div class="plot-title">Zoomed View (Elastic + 0.2% Offset Region)</div>
+  <div id="curveZoom"></div>
+  <div class="hint">This zoom makes the 0.2% offset line and early-region properties much easier to see.</div>
+</div>
+
+<a href="index.html">← Back to Home</a>
 
 <script>
   // -----------------------------
-  // ASTM A36 material properties
+  // ASTM A36 (typical teaching values)
   // -----------------------------
-  const E = 200000;        // MPa
-  const sigma_y = 250;     // MPa
-  const sigma_uts = 430;   // MPa
+  const E = 200000;        // MPa (200 GPa)
+  const sigma_y = 250;     // MPa (A36 minimum yield ≈ 36 ksi)
+  const sigma_uts = 430;   // MPa (illustrative typical)
 
-  // Derived values
-  const eps_y = sigma_y / E; // elastic strain at yield
+  const eps_y = sigma_y / E; // elastic strain at yield (~0.00125)
+
+  // Proportional limit (illustrative, slightly below yield)
   const eps_prop = 0.0011;
-  const sigma_prop = E * eps_prop;
+  const sigma_prop = E * eps_prop; // ~220 MPa
 
-  // -----------------------------
-  // Stress–strain curve (engineering)
-  // -----------------------------
+  // Engineering stress–strain curve (illustrative)
   const curve = [
     {x: 0.0,    y: 0},
     {x: 0.0006, y: E * 0.0006},
     {x: eps_prop, y: sigma_prop},
     {x: eps_y,  y: sigma_y},
-    {x: 0.01,   y: sigma_y + 5},
-    {x: 0.03,   y: 310},
-    {x: 0.07,   y: 380},
-    {x: 0.12,   y: sigma_uts},   // UTS (necking starts)
-    {x: 0.18,   y: 410},
-    {x: 0.25,   y: 340}           // fracture
+    {x: 0.010,  y: sigma_y + 5},
+    {x: 0.030,  y: 310},
+    {x: 0.070,  y: 380},
+    {x: 0.120,  y: sigma_uts},   // UTS (necking begins)
+    {x: 0.180,  y: 410},
+    {x: 0.250,  y: 340}          // fracture
   ];
 
+  // 0.2% offset line (short and only near yield region so it doesn't ruin scaling)
+  // sigma = E*(eps - 0.002)
+  function makeOffsetLine(epsStart, epsEnd, step) {
+    const xs = [];
+    const ys = [];
+    for (let eps = epsStart; eps <= epsEnd; eps += step) {
+      xs.push(eps);
+      ys.push(E * (eps - 0.002));
+    }
+    return {xs, ys};
+  }
+  const offsetMain = makeOffsetLine(0.002, 0.006, 0.0001);
+  const offsetZoom = makeOffsetLine(0.002, 0.008, 0.00005);
+
+  // Modulus of resilience (area under elastic curve to yield)
+  // U_r = sigma_y^2 / (2E)
+  const Ur = (sigma_y * sigma_y) / (2 * E); // MPa == MJ/m^3 numerically
+
+  // Shaded resilience triangle (0 -> yield)
+  const resTriX = [0, eps_y, 0];
+  const resTriY = [0, sigma_y, 0];
+
   // -----------------------------
-  // 0.2% offset line (SHORTENED)
+  // Quiz-style hover points (NO labels)
   // -----------------------------
-  const offsetX = [];
-  const offsetY = [];
-  for (let eps = 0.002; eps <= 0.006; eps += 0.0001) {
-    offsetX.push(eps);
-    offsetY.push(E * (eps - 0.002));
+  // To make proportional limit and yield easier to hover, we create "callout markers"
+  // located a bit away from the cluster, and draw leader lines back to the true point.
+
+  const calloutProp = { x: 0.0032, y: 260 }; // hover here instead of the crowded origin
+  const calloutYield = { x: 0.0032, y: 340 };
+
+  // Other points can sit at their true locations
+  const ptE = { x: 0.0007, y: E * 0.0007 };
+  const ptUTS = { x: 0.120, y: sigma_uts };
+  const ptFrac = { x: 0.250, y: 340 };
+
+  // Hover text with units + short explanations (quiz reveal)
+  const hoverE =
+    `<b>Modulus of Elasticity, E</b><br>` +
+    `Definition: slope of elastic region (Hooke’s law)<br>` +
+    `<b>σ = E·ε</b><br>` +
+    `E ≈ <b>200 GPa</b> (steel typical)`;
+
+  const hoverProp =
+    `<b>Proportional Limit</b><br>` +
+    `Highest stress where σ–ε is perfectly linear<br>` +
+    `Approx here: ε ≈ <b>${eps_prop.toFixed(4)} in/in</b>, ` +
+    `σ ≈ <b>${Math.round(sigma_prop)} MPa</b>`;
+
+  const hoverYield =
+    `<b>Yield Strength (A36)</b><br>` +
+    `Onset of permanent (plastic) deformation<br>` +
+    `σ<sub>y</sub> ≈ <b>${sigma_y} MPa</b> (≈36 ksi min)<br>` +
+    `Elastic ε at yield ≈ <b>${eps_y.toFixed(5)} in/in</b>`;
+
+  const hoverOffset =
+    `<b>0.2% Offset Line</b><br>` +
+    `Line with slope E, shifted by ε = 0.002<br>` +
+    `Used to define “0.2% offset yield” consistently<br>` +
+    `Equation: <b>σ = E(ε − 0.002)</b>`;
+
+  const hoverRes =
+    `<b>Modulus of Resilience, U<sub>r</sub></b><br>` +
+    `Elastic energy absorbed per unit volume up to yield<br>` +
+    `Area under elastic curve to σ<sub>y</sub><br>` +
+    `<b>U<sub>r</sub> = σ<sub>y</sub><sup>2</sup> / (2E)</b><br>` +
+    `U<sub>r</sub> ≈ <b>${Ur.toFixed(4)} MPa</b> (≈ ${Ur.toFixed(4)} MJ/m³)`;
+
+  const hoverUTS =
+    `<b>Ultimate Tensile Strength (UTS)</b><br>` +
+    `Maximum <i>engineering</i> stress on the curve<br>` +
+    `UTS ≈ <b>${sigma_uts} MPa</b><br>` +
+    `<b>Necking begins at/just after UTS</b> (engineering curve peak)<br>` +
+    `After this, engineering stress drops due to localized area reduction`;
+
+  const hoverFrac =
+    `<b>Fracture</b><br>` +
+    `Final failure point after necking<br>` +
+    `Engineering fracture point here: ε ≈ <b>${ptFrac.x.toFixed(3)} in/in</b>, ` +
+    `σ ≈ <b>${Math.round(ptFrac.y)} MPa</b>`;
+
+  // -----------------------------
+  // Build traces (shared)
+  // -----------------------------
+  function buildTraces(offsetXs, offsetYs, isZoom) {
+    const curveTrace = {
+      x: curve.map(p => p.x),
+      y: curve.map(p => p.y),
+      mode: 'lines',
+      name: 'A36 Steel (Illustrative)',
+      line: { width: 4 },
+      hoverinfo: 'skip'
+    };
+
+    const offsetTrace = {
+      x: offsetXs,
+      y: offsetYs,
+      mode: 'lines',
+      name: '0.2% Offset Line',
+      line: { dash: 'dash', width: 2 },
+      hovertemplate: hoverOffset + '<extra></extra>'
+    };
+
+    const resilienceTrace = {
+      x: resTriX,
+      y: resTriY,
+      mode: 'lines',
+      fill: 'toself',
+      name: 'Modulus of Resilience',
+      opacity: 0.30,
+      line: { width: 1 },
+      hovertemplate: hoverRes + '<extra></extra>'
+    };
+
+    // Hover points: no text labels, just hover “reveal”
+    // Proportional limit and yield use callout markers to avoid tight clustering.
+    const hoverPointsTrace = {
+      x: [ptE.x, calloutProp.x, calloutYield.x, ptUTS.x, ptFrac.x],
+      y: [ptE.y, calloutProp.y, calloutYield.y, ptUTS.y, ptFrac.y],
+      mode: 'markers',
+      name: 'Hover Points',
+      marker: { size: 11 },
+      hovertemplate: [
+        hoverE,
+        hoverProp,
+        hoverYield,
+        hoverUTS,
+        hoverFrac
+      ].map(s => s + '<extra></extra>'),
+      // Per-point hovertemplate support: set hovertext via text + hovertemplate="%{text}"
+      text: [hoverE, hoverProp, hoverYield, hoverUTS, hoverFrac],
+      hovertemplate: '%{text}<extra></extra>'
+    };
+
+    return { curveTrace, offsetTrace, resilienceTrace, hoverPointsTrace };
   }
 
   // -----------------------------
-  // Modulus of resilience (shaded)
+  // Layout + leader lines
   // -----------------------------
-  const Ur = (sigma_y * sigma_y) / (2 * E);
+  function buildLayout(isZoom) {
+    const xRange = isZoom ? [0, 0.010] : [0, 0.27];
+    const yRange = isZoom ? [0, 500] : [0, 500];
 
-  const resilienceTrace = {
-    x: [0, eps_y, 0],
-    y: [0, sigma_y, 0],
-    fill: 'toself',
-    opacity: 0.35,
-    name: 'Modulus of Resilience',
-    hoverinfo: 'skip'
-  };
+    return {
+      title: isZoom ? '' : '',
+      xaxis: { title: 'Strain, ε (in/in)', range: xRange },
+      yaxis: { title: 'Stress, σ (MPa)', range: yRange },
+      legend: { orientation: 'h', y: -0.18 },
+      margin: { t: 20, r: 20, b: 70, l: 70 },
 
-  // -----------------------------
-  // Clickable markers
-  // -----------------------------
-  const markers = [
-    {
-      name: "Elastic Modulus (E)",
-      x: 0.0007,
-      y: E * 0.0007,
-      title: "Modulus of Elasticity (E)",
-      text: "Slope of elastic region: σ = Eε",
-      kv: { "E": "200 GPa", "Meaning": "Material stiffness" }
-    },
-    {
-      name: "Proportional Limit",
-      x: eps_prop,
-      y: sigma_prop,
-      title: "Proportional Limit",
-      text: "End of perfectly linear stress–strain behavior.",
-      kv: { "σ": "≈220 MPa", "ε": eps_prop.toFixed(4) }
-    },
-    {
-      name: "Yield Strength",
-      x: eps_y,
-      y: sigma_y,
-      title: "Yield Strength (σy)",
-      text: "Permanent plastic deformation begins.",
-      kv: { "σy": "250 MPa", "Definition": "A36 minimum yield" }
-    },
-    {
-      name: "UTS / Necking starts",
-      x: 0.12,
-      y: sigma_uts,
-      title: "Ultimate Tensile Strength (UTS)",
-      text: "Maximum engineering stress. Necking begins here.",
-      kv: { "UTS": "430 MPa", "After this": "Localized deformation" }
-    },
-    {
-      name: "Fracture",
-      x: 0.25,
-      y: 340,
-      title: "Fracture",
-      text: "Final failure of specimen after necking.",
-      kv: { "Occurs after": "Necking", "Type": "Ductile fracture" }
-    }
-  ];
+      // Leader lines (so users can hover the callout marker but still see what it points to)
+      shapes: [
+        // Proportional limit leader line
+        {
+          type: 'line',
+          x0: calloutProp.x, y0: calloutProp.y,
+          x1: eps_prop,      y1: sigma_prop,
+          line: { width: 2 }
+        },
+        // Yield leader line
+        {
+          type: 'line',
+          x0: calloutYield.x, y0: calloutYield.y,
+          x1: eps_y,          y1: sigma_y,
+          line: { width: 2 }
+        }
+      ],
+
+      // Minimal annotations (no “answers” / no labels)
+      // but we can give a generic hint arrow if you want; currently none to keep it quiz-like.
+    };
+  }
 
   // -----------------------------
-  // Plotly traces
+  // Render Main Plot
   // -----------------------------
-  const curveTrace = {
-    x: curve.map(p => p.x),
-    y: curve.map(p => p.y),
-    mode: 'lines',
-    line: { width: 4 },
-    name: 'A36 Steel'
-  };
-
-  const offsetTrace = {
-    x: offsetX,
-    y: offsetY,
-    mode: 'lines',
-    line: { dash: 'dash', width: 2 },
-    name: '0.2% Offset Line'
-  };
-
-  const markerTrace = {
-    x: markers.map(p => p.x),
-    y: markers.map(p => p.y),
-    mode: 'markers+text',
-    text: markers.map(p => p.name),
-    textposition: 'top center',
-    marker: { size: 10 },
-    customdata: markers
-  };
-
-  const layout = {
-    xaxis: { title: 'Strain, ε (in/in)' },
-    yaxis: {
-      title: 'Stress, σ (MPa)',
-      range: [0, 500]
-    },
-    legend: { orientation: 'h', y: -0.2 }
-  };
-
+  const tMain = buildTraces(offsetMain.xs, offsetMain.ys, false);
   Plotly.newPlot(
-    'curve',
-    [resilienceTrace, curveTrace, offsetTrace, markerTrace],
-    layout,
+    'curveMain',
+    [tMain.resilienceTrace, tMain.curveTrace, tMain.offsetTrace, tMain.hoverPointsTrace],
+    buildLayout(false),
     { responsive: true }
   );
 
   // -----------------------------
-  // Modal logic
+  // Render Zoom Plot
   // -----------------------------
-  function openModal(data) {
-    document.getElementById('modalTitle').innerText = data.title;
-    document.getElementById('modalContent').innerText = data.text;
-    const kv = document.getElementById('modalKV');
-    kv.innerHTML = '';
-    Object.entries(data.kv).forEach(([k,v]) => {
-      kv.innerHTML += `<div><span class="pill">${k}</span><b>${v}</b></div>`;
-    });
-    document.getElementById('modalBackdrop').style.display = 'flex';
-  }
-
-  function closeModal() {
-    document.getElementById('modalBackdrop').style.display = 'none';
-  }
-
-  document.getElementById('curve').on('plotly_click', function(e) {
-    if (e.points[0].customdata) {
-      openModal(e.points[0].customdata);
-    }
-  });
+  const tZoom = buildTraces(offsetZoom.xs, offsetZoom.ys, true);
+  Plotly.newPlot(
+    'curveZoom',
+    [tZoom.resilienceTrace, tZoom.curveTrace, tZoom.offsetTrace, tZoom.hoverPointsTrace],
+    buildLayout(true),
+    { responsive: true }
+  );
 </script>
 
 </body>
