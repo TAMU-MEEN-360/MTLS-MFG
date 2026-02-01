@@ -1,139 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Conceptual Stress–Strain Curve</title>
+  <meta charset="UTF-8">
+  <title>Engineering Stress–Strain (ASTM A36 Steel)</title>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    background: #111;
-    color: white;
-    margin: 0;
-    padding: 20px;
-  }
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background-color: #f3f4f6;
+      color: #111827;
+    }
+    h1 { text-align: center; margin-bottom: 6px; }
+    p  { text-align: center; color: #374151; margin-top: 0; }
 
-  svg {
-    background: #1c1c1c;
-    border-radius: 10px;
-  }
+    .plot-wrap {
+      max-width: 1050px;
+      margin: 0 auto 22px;
+      background: white;
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
 
-  .axis {
-    stroke: white;
-    stroke-width: 2;
-  }
+    #curveMain, #curveZoom {
+      width: 100%;
+      height: 560px;
+    }
 
-  .curve {
-    fill: none;
-    stroke: #4aa3ff;
-    stroke-width: 3;
-  }
-
-  .offset-line {
-    stroke: #00ff88;
-    stroke-width: 2;
-    stroke-dasharray: 6 6;
-  }
-
-  .point {
-    fill: white;
-  }
-
-  .label {
-    font-size: 14px;
-    fill: white;
-  }
-
-  .elastic-modulus {
-    stroke: #ffaa00;
-    stroke-width: 2;
-    marker-end: url(#arrow);
-  }
-
-  .hover-only {
-    pointer-events: none;
-  }
-
-  .offset-hover {
-    pointer-events: all;
-    fill: transparent;
-  }
-</style>
+    a {
+      display: block;
+      text-align: center;
+      margin-top: 18px;
+      color: #4f46e5;
+      text-decoration: none;
+    }
+  </style>
 </head>
 
 <body>
 
-<h2>Conceptual Engineering Stress–Strain Curve</h2>
+<h1>Engineering Stress–Strain (ASTM A36 Steel)</h1>
+<p>Hover over the points to identify material properties.</p>
 
-<svg width="900" height="500" viewBox="0 0 900 500">
+<div class="plot-wrap">
+  <div id="curveMain"></div>
+</div>
 
-  <!-- Arrow definition -->
-  <defs>
-    <marker id="arrow" markerWidth="10" markerHeight="10"
-            refX="5" refY="5" orient="auto">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#ffaa00"/>
-    </marker>
-  </defs>
+<div class="plot-wrap">
+  <div id="curveZoom"></div>
+</div>
 
-  <!-- Axes -->
-  <line class="axis" x1="80" y1="420" x2="820" y2="420"/>
-  <line class="axis" x1="80" y1="420" x2="80" y2="60"/>
+<a href="index.html">← Back to Home</a>
 
-  <!-- Stress–strain curve -->
-  <path class="curve"
-    d="
-      M 80 420
-      L 240 280              <!-- Linear elastic -->
-      L 260 270              <!-- Elastic limit -->
-      L 310 250              <!-- Yield strength -->
-      L 480 180              <!-- Ultimate strength -->
-      L 620 260              <!-- Necking -->
-      L 700 330              <!-- Fracture -->
-    "
-  />
+<script>
+  // -----------------------------
+  // Material constants (typical A36)
+  // -----------------------------
+  const E = 200000;        // MPa
+  const sigma_y = 250;     // MPa
+  const sigma_uts = 430;   // MPa
 
-  <!-- 0.2% offset line -->
-  <line class="offset-line"
-    x1="120" y1="420"
-    x2="360" y2="180"
-  />
+  const eps_prop = 0.0011;
+  const sigma_prop = E * eps_prop;
 
-  <!-- Elastic limit -->
-  <circle class="point" cx="260" cy="270" r="5"/>
-  <text class="label" x="240" y="250">Elastic Limit</text>
+  const eps_y = sigma_y / E;
 
-  <!-- Yield strength (INTERSECTS curve & offset line) -->
-  <circle class="point" cx="310" cy="250" r="5"/>
-  <text class="label" x="320" y="240">Yield Strength</text>
+  // -----------------------------
+  // Stress–strain curve (illustrative)
+  // -----------------------------
+  const curve = [
+    {x: 0.0,    y: 0},
+    {x: eps_prop, y: sigma_prop},
+    {x: eps_y,  y: sigma_y},
+    {x: 0.010,  y: 255},
+    {x: 0.030,  y: 310},
+    {x: 0.070,  y: 380},
+    {x: 0.120,  y: sigma_uts},
+    {x: 0.180,  y: 410},
+    {x: 0.250,  y: 340}
+  ];
 
-  <!-- Ultimate tensile strength -->
-  <circle class="point" cx="480" cy="180" r="5"/>
-  <text class="label" x="490" y="170">Ultimate Strength</text>
+  // -----------------------------
+  // 0.2% offset line (NO hover)
+  // -----------------------------
+  function offsetLine(e0, e1, step) {
+    const xs = [], ys = [];
+    for (let e = e0; e <= e1; e += step) {
+      xs.push(e);
+      ys.push(E * (e - 0.002));
+    }
+    return { xs, ys };
+  }
 
-  <!-- Fracture -->
-  <circle class="point" cx="700" cy="330" r="5"/>
-  <text class="label" x="710" y="345">Fracture</text>
+  const offset = offsetLine(0.002, 0.008, 0.00005);
 
-  <!-- Elastic modulus arrow -->
-  <line class="elastic-modulus"
-    x1="120" y1="390"
-    x2="220" y2="300"
-  />
-  <text class="label" x="140" y="320">Elastic Modulus (E)</text>
+  // -----------------------------
+  // Key points
+  // -----------------------------
+  const ptProp = { x: eps_prop, y: sigma_prop };
+  const ptYield = { x: eps_y, y: sigma_y };
+  const ptUTS = { x: 0.120, y: sigma_uts };
 
-  <!-- Hoverable point for 0.2% offset explanation (HIGH ABOVE CURVE) -->
-  <circle class="offset-hover" cx="350" cy="130" r="12">
-    <title>0.2% Offset Line (Used to define yield strength)</title>
-  </circle>
-  <text class="label" x="365" y="135">0.2% Offset Line</text>
+  // Offset hover point (far away from curve)
+  const offsetHover = { x: 0.0065, y: 460 };
 
-  <!-- Axis labels -->
-  <text class="label" x="390" y="460">Strain</text>
-  <text class="label" x="20" y="250" transform="rotate(-90 20,250)">
-    Stress
-  </text>
+  // -----------------------------
+  // Traces
+  // -----------------------------
+  const curveTrace = {
+    x: curve.map(p => p.x),
+    y: curve.map(p => p.y),
+    mode: 'lines',
+    line: { width: 4 },
+    hoverinfo: 'skip',
+    name: 'Stress–Strain Curve'
+  };
 
-</svg>
+  const offsetTrace = {
+    x: offset.xs,
+    y: offset.ys,
+    mode: 'lines',
+    line: { dash: 'dash', width: 2, color: 'green' },
+    hoverinfo: 'skip',
+    name: '0.2% Offset Line'
+  };
+
+  const pointsTrace = {
+    x: [ptProp.x, ptYield.x, ptUTS.x, offsetHover.x],
+    y: [ptProp.y, ptYield.y, ptUTS.y, offsetHover.y],
+    mode: 'markers',
+    marker: { size: 10 },
+    text: [
+      `<b>Proportional (Elastic) Limit</b><br>Last point of linear behavior`,
+      `<b>Yield Strength</b><br>Permanent plastic deformation begins`,
+      `<b>Ultimate Tensile Strength</b><br>Maximum engineering stress`,
+      `<b>0.2% Offset Method</b><br>Line parallel to elastic slope, shifted by ε = 0.002`
+    ],
+    hovertemplate: '%{text}<extra></extra>',
+    name: 'Key Points'
+  };
+
+  function layout(zoom) {
+    return {
+      xaxis: {
+        title: 'Strain, ε (in/in)',
+        range: zoom ? [0, 0.01] : [0, 0.27]
+      },
+      yaxis: {
+        title: 'Stress, σ (MPa)',
+        range: [0, 500]
+      },
+      margin: { t: 30, l: 70, r: 20, b: 70 },
+      showlegend: false
+    };
+  }
+
+  Plotly.newPlot(
+    'curveMain',
+    [curveTrace, offsetTrace, pointsTrace],
+    layout(false),
+    { responsive: true }
+  );
+
+  Plotly.newPlot(
+    'curveZoom',
+    [curveTrace, offsetTrace, pointsTrace],
+    layout(true),
+    { responsive: true }
+  );
+</script>
 
 </body>
 </html>
