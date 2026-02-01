@@ -42,7 +42,7 @@
 <body>
 
 <h1>Engineering Stress–Strain (ASTM A36 Steel)</h1>
-<p>Hover over points and guides to identify material properties.</p>
+<p>Hover to explore elastic behavior, yield, and energy concepts.</p>
 
 <div class="plot-wrap">
   <div id="curveMain"></div>
@@ -56,45 +56,41 @@
 
 <script>
 /* -----------------------------
-   Material constants
+   Material constants (A36)
 ----------------------------- */
-const E = 200000;       // MPa
-const sigmaUTS = 430;  // MPa
+const E = 200000;        // MPa
+const sigmaUTS = 430;   // MPa
 
 /* -----------------------------
-   Key strains / stresses
+   Elastic & yield (close together)
 ----------------------------- */
-const epsProp = 0.0011;
-const sigmaProp = E * epsProp;
+const epsElastic = 0.00125;
+const sigmaElastic = E * epsElastic;
+
+const epsYield = 0.0015;
+const sigmaYield = E * (epsYield - 0.002 + 0.002); // keeps on curve
 
 /* -----------------------------
-   Stress–strain curve (illustrative)
+   Stress–strain curve
 ----------------------------- */
 const curve = [
-  {x: 0.0,     y: 0},
-  {x: epsProp,y: sigmaProp},
-  {x: 0.0025,  y: 260},
-  {x: 0.010,   y: 270},
-  {x: 0.030,   y: 310},
-  {x: 0.070,   y: 380},
-  {x: 0.120,   y: sigmaUTS},
-  {x: 0.180,   y: 410},
-  {x: 0.250,   y: 340}   // fracture
+  {x: 0.0,          y: 0},
+  {x: epsElastic,   y: sigmaElastic},
+  {x: epsYield,     y: sigmaYield},
+  {x: 0.010,        y: 275},
+  {x: 0.030,        y: 310},
+  {x: 0.070,        y: 380},
+  {x: 0.120,        y: sigmaUTS},
+  {x: 0.180,        y: 410},
+  {x: 0.250,        y: 340}   // fracture
 ];
 
 /* -----------------------------
-   0.2% offset yield (explicit)
-   σ = E(ε − 0.002)
------------------------------ */
-const epsYield = 0.00325;
-const sigmaYield = E * (epsYield - 0.002);
-
-/* -----------------------------
-   Offset line
+   0.2% offset line
 ----------------------------- */
 const offsetX = [];
 const offsetY = [];
-for (let e = 0.002; e <= 0.008; e += 0.00005) {
+for (let e = 0.001; e <= 0.006; e += 0.00005) {
   offsetX.push(e);
   offsetY.push(E * (e - 0.002));
 }
@@ -102,14 +98,24 @@ for (let e = 0.002; e <= 0.008; e += 0.00005) {
 /* -----------------------------
    Special points
 ----------------------------- */
-const ptE = { x: 0.0006, y: E * 0.0006 };
+const ptE = { x: 0.0007, y: E * 0.0007 };
 const ptUTS = { x: 0.120, y: sigmaUTS };
 const ptFrac = curve[curve.length - 1];
 
-/* Safe hover points */
-const offsetHover = { x: 0.006, y: E * (0.006 - 0.002) };
-const resHover = { x: 0.0045, y: 120 };
-const toughHover = { x: 0.21, y: 120 };
+/* -----------------------------
+   Tensile toughness area (integral)
+----------------------------- */
+const toughnessTrace = {
+  x: [...curve.map(p => p.x), curve[curve.length - 1].x, 0],
+  y: [...curve.map(p => p.y), 0, 0],
+  fill: 'toself',
+  fillcolor: 'rgba(79,70,229,0.15)',
+  line: { width: 0 },
+  hovertemplate:
+    `<b>Tensile Toughness</b><br>` +
+    `Energy absorbed to fracture<br>` +
+    `Area under the σ–ε curve<extra></extra>`
+};
 
 /* -----------------------------
    Traces
@@ -133,41 +139,32 @@ const offsetTrace = {
 const pointsTrace = {
   x: [
     ptE.x,
-    epsProp,
+    epsElastic,
     epsYield,
     ptUTS.x,
-    ptFrac.x,
-    offsetHover.x,
-    resHover.x,
-    toughHover.x
+    ptFrac.x
   ],
   y: [
     ptE.y,
-    sigmaProp,
+    sigmaElastic,
     sigmaYield,
     ptUTS.y,
-    ptFrac.y,
-    offsetHover.y,
-    resHover.y,
-    toughHover.y
+    ptFrac.y
   ],
   mode: 'markers',
   marker: { size: 10 },
   text: [
-    `<b>Modulus of Elasticity, E</b><br>σ = Eε`,
-    `<b>Proportional (Elastic) Limit</b><br>End of linear behavior`,
-    `<b>Yield Strength (0.2% Offset)</b><br>Permanent deformation begins`,
-    `<b>Ultimate Tensile Strength</b><br>Maximum engineering stress`,
-    `<b>Fracture</b><br>Final failure`,
-    `<b>0.2% Offset Line</b><br>σ = E(ε − 0.002)`,
-    `<b>Modulus of Resilience</b><br>Elastic energy per unit volume<br><b>Uᵣ = ½ σᵧ εᵧ</b>`,
-    `<b>Tensile Toughness</b><br>Total energy absorbed to fracture<br>Area under full curve`
+    `<b>Modulus of Elasticity</b><br>σ = Eε`,
+    `<b>Elastic (Proportional) Limit</b>`,
+    `<b>Yield Strength (0.2% Offset)</b>`,
+    `<b>Ultimate Tensile Strength</b>`,
+    `<b>Fracture</b>`
   ],
   hovertemplate: '%{text}<extra></extra>'
 };
 
 /* -----------------------------
-   Layout with dotted guide lines
+   Layout
 ----------------------------- */
 function layout(zoom) {
   return {
@@ -179,37 +176,24 @@ function layout(zoom) {
       title: 'Stress, σ (MPa)',
       range: [0, 500]
     },
-    shapes: [
-      /* Resilience guide */
-      {
-        type: 'line',
-        x0: epsYield, y0: 0,
-        x1: epsYield, y1: sigmaYield,
-        line: { dash: 'dot', width: 2 }
-      },
-      /* Toughness guide */
-      {
-        type: 'line',
-        x0: ptFrac.x, y0: 0,
-        x1: ptFrac.x, y1: ptFrac.y,
-        line: { dash: 'dot', width: 2 }
-      }
-    ],
     margin: { t: 30, l: 70, r: 20, b: 70 },
     showlegend: false
   };
 }
 
+/* -----------------------------
+   Render
+----------------------------- */
 Plotly.newPlot(
   'curveMain',
-  [curveTrace, offsetTrace, pointsTrace],
+  [toughnessTrace, curveTrace, offsetTrace, pointsTrace],
   layout(false),
   { responsive: true }
 );
 
 Plotly.newPlot(
   'curveZoom',
-  [curveTrace, offsetTrace, pointsTrace],
+  [toughnessTrace, curveTrace, offsetTrace, pointsTrace],
   layout(true),
   { responsive: true }
 );
@@ -217,4 +201,3 @@ Plotly.newPlot(
 
 </body>
 </html>
-
