@@ -42,7 +42,7 @@
 <body>
 
 <h1>Engineering Stress–Strain (ASTM A36 Steel)</h1>
-<p>Hover over points to identify material properties.</p>
+<p>Hover over points and guides to identify material properties.</p>
 
 <div class="plot-wrap">
   <div id="curveMain"></div>
@@ -55,182 +55,166 @@
 <a href="index.html">← Back to Home</a>
 
 <script>
-  // -----------------------------
-  // Material constants (A36 – teaching values)
-  // -----------------------------
-  const E = 200000;        // MPa
-  const sigma_uts = 430;   // MPa
+/* -----------------------------
+   Material constants
+----------------------------- */
+const E = 200000;       // MPa
+const sigmaUTS = 430;  // MPa
 
-  // -----------------------------
-  // Elastic / proportional limit
-  // -----------------------------
-  const eps_prop = 0.0011;
-  const sigma_prop = E * eps_prop;
+/* -----------------------------
+   Key strains / stresses
+----------------------------- */
+const epsProp = 0.0011;
+const sigmaProp = E * epsProp;
 
-  // -----------------------------
-  // Engineering stress–strain curve (illustrative)
-  // -----------------------------
-  const curve = [
-    {x: 0.0,     y: 0},
-    {x: eps_prop,y: sigma_prop},
-    {x: 0.0025,  y: 260},
-    {x: 0.010,   y: 270},
-    {x: 0.030,   y: 310},
-    {x: 0.070,   y: 380},
-    {x: 0.120,   y: sigma_uts},
-    {x: 0.180,   y: 410},
-    {x: 0.250,   y: 340}   // fracture
-  ];
+/* -----------------------------
+   Stress–strain curve (illustrative)
+----------------------------- */
+const curve = [
+  {x: 0.0,     y: 0},
+  {x: epsProp,y: sigmaProp},
+  {x: 0.0025,  y: 260},
+  {x: 0.010,   y: 270},
+  {x: 0.030,   y: 310},
+  {x: 0.070,   y: 380},
+  {x: 0.120,   y: sigmaUTS},
+  {x: 0.180,   y: 410},
+  {x: 0.250,   y: 340}   // fracture
+];
 
-  // -----------------------------
-  // 0.2% offset line
-  // σ = E(ε − 0.002)
-  // -----------------------------
-  function offsetLine(e0, e1, step) {
-    const xs = [], ys = [];
-    for (let e = e0; e <= e1; e += step) {
-      xs.push(e);
-      ys.push(E * (e - 0.002));
-    }
-    return { xs, ys };
-  }
+/* -----------------------------
+   0.2% offset yield (explicit)
+   σ = E(ε − 0.002)
+----------------------------- */
+const epsYield = 0.00325;
+const sigmaYield = E * (epsYield - 0.002);
 
-  const offset = offsetLine(0.002, 0.008, 0.00002);
+/* -----------------------------
+   Offset line
+----------------------------- */
+const offsetX = [];
+const offsetY = [];
+for (let e = 0.002; e <= 0.008; e += 0.00005) {
+  offsetX.push(e);
+  offsetY.push(E * (e - 0.002));
+}
 
-  // -----------------------------
-  // Find yield point = intersection of offset line and curve
-  // -----------------------------
-  function findIntersection(curve, offset) {
-    for (let i = 1; i < curve.length; i++) {
-      const c0 = curve[i - 1];
-      const c1 = curve[i];
+/* -----------------------------
+   Special points
+----------------------------- */
+const ptE = { x: 0.0006, y: E * 0.0006 };
+const ptUTS = { x: 0.120, y: sigmaUTS };
+const ptFrac = curve[curve.length - 1];
 
-      for (let j = 1; j < offset.xs.length; j++) {
-        const o0 = {x: offset.xs[j - 1], y: offset.ys[j - 1]};
-        const o1 = {x: offset.xs[j],     y: offset.ys[j]};
+/* Safe hover points */
+const offsetHover = { x: 0.006, y: E * (0.006 - 0.002) };
+const resHover = { x: 0.0045, y: 120 };
+const toughHover = { x: 0.21, y: 120 };
 
-        if ((c0.y - o0.y) * (c1.y - o1.y) < 0) {
-          const t = (o0.y - c0.y) / ((c1.y - c0.y) - (o1.y - o0.y));
-          return {
-            x: c0.x + t * (c1.x - c0.x),
-            y: c0.y + t * (c1.y - c0.y)
-          };
-        }
+/* -----------------------------
+   Traces
+----------------------------- */
+const curveTrace = {
+  x: curve.map(p => p.x),
+  y: curve.map(p => p.y),
+  mode: 'lines',
+  line: { width: 4 },
+  hoverinfo: 'skip'
+};
+
+const offsetTrace = {
+  x: offsetX,
+  y: offsetY,
+  mode: 'lines',
+  line: { dash: 'dash', width: 2, color: 'green' },
+  hoverinfo: 'skip'
+};
+
+const pointsTrace = {
+  x: [
+    ptE.x,
+    epsProp,
+    epsYield,
+    ptUTS.x,
+    ptFrac.x,
+    offsetHover.x,
+    resHover.x,
+    toughHover.x
+  ],
+  y: [
+    ptE.y,
+    sigmaProp,
+    sigmaYield,
+    ptUTS.y,
+    ptFrac.y,
+    offsetHover.y,
+    resHover.y,
+    toughHover.y
+  ],
+  mode: 'markers',
+  marker: { size: 10 },
+  text: [
+    `<b>Modulus of Elasticity, E</b><br>σ = Eε`,
+    `<b>Proportional (Elastic) Limit</b><br>End of linear behavior`,
+    `<b>Yield Strength (0.2% Offset)</b><br>Permanent deformation begins`,
+    `<b>Ultimate Tensile Strength</b><br>Maximum engineering stress`,
+    `<b>Fracture</b><br>Final failure`,
+    `<b>0.2% Offset Line</b><br>σ = E(ε − 0.002)`,
+    `<b>Modulus of Resilience</b><br>Elastic energy per unit volume<br><b>Uᵣ = ½ σᵧ εᵧ</b>`,
+    `<b>Tensile Toughness</b><br>Total energy absorbed to fracture<br>Area under full curve`
+  ],
+  hovertemplate: '%{text}<extra></extra>'
+};
+
+/* -----------------------------
+   Layout with dotted guide lines
+----------------------------- */
+function layout(zoom) {
+  return {
+    xaxis: {
+      title: 'Strain, ε (in/in)',
+      range: zoom ? [0, 0.01] : [0, 0.27]
+    },
+    yaxis: {
+      title: 'Stress, σ (MPa)',
+      range: [0, 500]
+    },
+    shapes: [
+      /* Resilience guide */
+      {
+        type: 'line',
+        x0: epsYield, y0: 0,
+        x1: epsYield, y1: sigmaYield,
+        line: { dash: 'dot', width: 2 }
+      },
+      /* Toughness guide */
+      {
+        type: 'line',
+        x0: ptFrac.x, y0: 0,
+        x1: ptFrac.x, y1: ptFrac.y,
+        line: { dash: 'dot', width: 2 }
       }
-    }
-    return null;
-  }
-
-  const yieldPt = findIntersection(curve, offset);
-
-  // -----------------------------
-  // Key points
-  // -----------------------------
-  const ptE = { x: 0.0006, y: E * 0.0006 };
-  const ptUTS = { x: 0.120, y: sigma_uts };
-  const ptFrac = curve[curve.length - 1];
-
-  // Hover point ON offset line (non-interfering)
-  const offsetHoverX = 0.006;
-  const offsetHoverY = E * (offsetHoverX - 0.002);
-
-  // -----------------------------
-  // Modulus of resilience (area to yield)
-  // -----------------------------
-  const resX = [0, yieldPt.x, 0];
-  const resY = [0, yieldPt.y, 0];
-
-  // -----------------------------
-  // Traces
-  // -----------------------------
-  const curveTrace = {
-    x: curve.map(p => p.x),
-    y: curve.map(p => p.y),
-    mode: 'lines',
-    line: { width: 4 },
-    hoverinfo: 'skip'
-  };
-
-  const offsetTrace = {
-    x: offset.xs,
-    y: offset.ys,
-    mode: 'lines',
-    line: { dash: 'dash', width: 2, color: 'green' },
-    hoverinfo: 'skip'
-  };
-
-  const resilienceTrace = {
-    x: resX,
-    y: resY,
-    fill: 'toself',
-    opacity: 0.3,
-    line: { width: 1 },
-    hovertemplate:
-      `<b>Modulus of Resilience</b><br>` +
-      `Elastic energy per unit volume<br>` +
-      `Area under curve up to yield<br>` +
-      `<b>Uᵣ = σᵧ² / (2E)</b><extra></extra>`
-  };
-
-  const pointsTrace = {
-    x: [
-      ptE.x,
-      eps_prop,
-      yieldPt.x,
-      ptUTS.x,
-      ptFrac.x,
-      offsetHoverX
     ],
-    y: [
-      ptE.y,
-      sigma_prop,
-      yieldPt.y,
-      ptUTS.y,
-      ptFrac.y,
-      offsetHoverY
-    ],
-    mode: 'markers',
-    marker: { size: 10 },
-    text: [
-      `<b>Modulus of Elasticity, E</b><br>σ = Eε`,
-      `<b>Proportional (Elastic) Limit</b><br>End of linear behavior`,
-      `<b>Yield Strength (0.2% Offset)</b><br>Permanent deformation begins`,
-      `<b>Ultimate Tensile Strength</b><br>Maximum engineering stress`,
-      `<b>Fracture</b><br>Final failure`,
-      `<b>0.2% Offset Line</b><br>σ = E(ε − 0.002)`
-    ],
-    hovertemplate: '%{text}<extra></extra>'
+    margin: { t: 30, l: 70, r: 20, b: 70 },
+    showlegend: false
   };
+}
 
-  function layout(zoom) {
-    return {
-      xaxis: {
-        title: 'Strain, ε (in/in)',
-        range: zoom ? [0, 0.01] : [0, 0.27]
-      },
-      yaxis: {
-        title: 'Stress, σ (MPa)',
-        range: [0, 500]
-      },
-      margin: { t: 30, l: 70, r: 20, b: 70 },
-      showlegend: false
-    };
-  }
+Plotly.newPlot(
+  'curveMain',
+  [curveTrace, offsetTrace, pointsTrace],
+  layout(false),
+  { responsive: true }
+);
 
-  Plotly.newPlot(
-    'curveMain',
-    [resilienceTrace, curveTrace, offsetTrace, pointsTrace],
-    layout(false),
-    { responsive: true }
-  );
-
-  Plotly.newPlot(
-    'curveZoom',
-    [resilienceTrace, curveTrace, offsetTrace, pointsTrace],
-    layout(true),
-    { responsive: true }
-  );
+Plotly.newPlot(
+  'curveZoom',
+  [curveTrace, offsetTrace, pointsTrace],
+  layout(true),
+  { responsive: true }
+);
 </script>
 
 </body>
 </html>
+
