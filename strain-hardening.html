@@ -2,155 +2,182 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Stress–Strain Curve</title>
+  <title>Engineering Stress–Strain Curve</title>
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
 
-<div id="stressStrainPlot" style="width:100%;max-width:900px;height:600px;margin:auto;"></div>
+<div id="plot" style="width:100%;max-width:950px;height:600px;margin:auto;"></div>
 
 <script>
-  /* -----------------------------
-     Define material-style values
-  ------------------------------*/
-  const E = 200;              // Young's modulus (arbitrary units)
-  const proportionalLimitStrain = 0.0018;
-  const yieldOffset = 0.002;
+/* -----------------------------
+   Parameters (engineering-style)
+------------------------------*/
+const E = 15000;                 // Young’s modulus (psi, scaled)
+const propLimitStrain = 0.0035;
+const offsetStrain = 0.002;
 
-  /* -----------------------------
-     Build stress-strain curve
-  ------------------------------*/
-  let strain = [];
-  let stress = [];
+/* -----------------------------
+   Main stress–strain curve
+------------------------------*/
+let strain = [];
+let stress = [];
 
-  for (let i = 0; i <= 300; i++) {
-    let eps = i * 0.00002;
+for (let i = 0; i <= 400; i++) {
+  let e = i * 0.00025;
 
-    let sig;
-    if (eps <= proportionalLimitStrain) {
-      // Linear elastic region
-      sig = E * eps;
-    } else {
-      // Nonlinear plastic region with decreasing slope
-      sig = E * proportionalLimitStrain
-          + 35 * (eps - proportionalLimitStrain)
-          - 300 * Math.pow(eps - proportionalLimitStrain, 2);
-    }
-
-    strain.push(eps);
-    stress.push(sig);
+  let s;
+  if (e <= propLimitStrain) {
+    // Linear elastic region
+    s = E * e;
+  } else if (e <= 0.06) {
+    // Plastic deformation, decreasing slope
+    s = E * propLimitStrain
+        + 25000 * (e - propLimitStrain)
+        - 180000 * Math.pow(e - propLimitStrain, 2);
+  } else {
+    // Necking to fracture
+    s = 40000 - 15000 * (e - 0.06);
   }
 
-  /* -----------------------------
-     0.2% offset line
-  ------------------------------*/
-  let offsetStrain = [];
-  let offsetStress = [];
+  strain.push(e);
+  stress.push(Math.max(s, 0));
+}
 
-  for (let i = 0; i <= 300; i++) {
-    let eps = i * 0.00002;
-    offsetStrain.push(eps);
-    offsetStress.push(E * (eps - yieldOffset));
+/* -----------------------------
+   0.2% offset line
+------------------------------*/
+let offsetX = [];
+let offsetY = [];
+
+for (let i = 0; i <= 400; i++) {
+  let e = i * 0.00025;
+  offsetX.push(e);
+  offsetY.push(E * (e - offsetStrain));
+}
+
+/* -----------------------------
+   Yield point (intersection)
+------------------------------*/
+let yieldIndex = 0;
+let minDiff = Infinity;
+
+for (let i = 0; i < strain.length; i++) {
+  let diff = Math.abs(stress[i] - offsetY[i]);
+  if (diff < minDiff) {
+    minDiff = diff;
+    yieldIndex = i;
   }
+}
 
-  /* -----------------------------
-     Find yield point (intersection)
-  ------------------------------*/
-  let yieldIndex = 0;
-  let minDiff = Infinity;
+const yieldStrain = strain[yieldIndex];
+const yieldStress = stress[yieldIndex];
+const propStress = E * propLimitStrain;
 
-  for (let i = 0; i < strain.length; i++) {
-    let diff = Math.abs(stress[i] - offsetStress[i]);
-    if (diff < minDiff) {
-      minDiff = diff;
-      yieldIndex = i;
-    }
+/* -----------------------------
+   Ultimate & fracture
+------------------------------*/
+const utsIndex = stress.indexOf(Math.max(...stress));
+const fractureIndex = strain.length - 1;
+
+/* -----------------------------
+   Plot traces
+------------------------------*/
+const curve = {
+  x: strain,
+  y: stress,
+  mode: "lines",
+  line: { width: 3, color: "red" },
+  name: "Stress–Strain Curve"
+};
+
+const offsetLine = {
+  x: offsetX,
+  y: offsetY,
+  mode: "lines",
+  line: { dash: "dash", width: 2, color: "black" },
+  name: "0.2% Offset Line"
+};
+
+const points = {
+  x: [
+    propLimitStrain,
+    yieldStrain,
+    strain[utsIndex],
+    strain[fractureIndex]
+  ],
+  y: [
+    propStress,
+    yieldStress,
+    stress[utsIndex],
+    stress[fractureIndex]
+  ],
+  mode: "markers",
+  marker: { size: 9, color: "black" },
+  text: [
+    "Proportional Limit<br>(end of linear elastic region)",
+    `Yield Strength (0.2% offset)<br>σᵧ ≈ ${yieldStress.toFixed(0)} psi`,
+    "Ultimate Tensile Strength",
+    "Fracture"
+  ],
+  hoverinfo: "text",
+  name: "Key Points"
+};
+
+/* -----------------------------
+   Annotations (textbook style)
+------------------------------*/
+const annotations = [
+  {
+    x: 0.0018,
+    y: 20000,
+    text: "Elastic stretching",
+    showarrow: false
+  },
+  {
+    x: 0.035,
+    y: 37000,
+    text: "Plastic deformation",
+    showarrow: false
+  },
+  {
+    x: yieldStrain,
+    y: yieldStress + 3000,
+    text: "Offset yield strength",
+    arrowhead: 3
+  },
+  {
+    x: 0.095,
+    y: 10000,
+    text: "Strain to failure",
+    showarrow: false
   }
+];
 
-  const yieldStrain = strain[yieldIndex];
-  const yieldStress = stress[yieldIndex];
+/* -----------------------------
+   Layout (matches textbook look)
+------------------------------*/
+const layout = {
+  title: "Engineering Stress–Strain Diagram",
+  plot_bgcolor: "#dbe7f3",
+  paper_bgcolor: "white",
+  xaxis: {
+    title: "Engineering strain e (in./in.)",
+    range: [0, 0.14],
+    dtick: 0.02,
+    zeroline: false
+  },
+  yaxis: {
+    title: "Engineering stress s (psi)",
+    range: [0, 45000],
+    dtick: 5000,
+    zeroline: false
+  },
+  annotations: annotations,
+  hovermode: "closest"
+};
 
-  const proportionalStress = E * proportionalLimitStrain;
-
-  /* -----------------------------
-     Special points
-  ------------------------------*/
-  const utsIndex = stress.indexOf(Math.max(...stress));
-  const fractureIndex = strain.length - 1;
-
-  const points = {
-    strain: [
-      proportionalLimitStrain,
-      yieldStrain,
-      strain[utsIndex],
-      strain[fractureIndex]
-    ],
-    stress: [
-      proportionalStress,
-      yieldStress,
-      stress[utsIndex],
-      stress[fractureIndex]
-    ],
-    labels: [
-      "Proportional Limit",
-      "Yield Strength (0.2% offset)",
-      "Ultimate Tensile Strength",
-      "Fracture"
-    ]
-  };
-
-  /* -----------------------------
-     Plot traces
-  ------------------------------*/
-  const curveTrace = {
-    x: strain,
-    y: stress,
-    mode: "lines",
-    name: "Stress–Strain Curve",
-    line: { width: 3 }
-  };
-
-  const offsetTrace = {
-    x: offsetStrain,
-    y: offsetStress,
-    mode: "lines",
-    name: "0.2% Offset Line",
-    line: { dash: "dot", width: 2 }
-  };
-
-  const pointsTrace = {
-    x: points.strain,
-    y: points.stress,
-    mode: "markers",
-    marker: { size: 10 },
-    text: points.labels.map((label, i) =>
-      `${label}<br>Strain = ${points.strain[i].toFixed(4)}<br>Stress = ${points.stress[i].toFixed(1)}`
-    ),
-    hoverinfo: "text",
-    name: "Key Points"
-  };
-
-  /* -----------------------------
-     Layout
-  ------------------------------*/
-  const layout = {
-    title: "Stress–Strain Curve with 0.2% Offset Method",
-    xaxis: {
-      title: "Strain",
-      zeroline: false
-    },
-    yaxis: {
-      title: "Stress",
-      zeroline: false
-    },
-    hovermode: "closest"
-  };
-
-  Plotly.newPlot(
-    "stressStrainPlot",
-    [curveTrace, offsetTrace, pointsTrace],
-    layout
-  );
+Plotly.newPlot("plot", [curve, offsetLine, points], layout);
 </script>
 
 </body>
