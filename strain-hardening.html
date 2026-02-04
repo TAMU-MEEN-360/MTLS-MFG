@@ -126,15 +126,14 @@
         };
 
         const pointsTrace = {
-            x: [ptProp.x, ptYield.x, ptUTS.x, offsetHover.x],
-            y: [ptProp.y, ptYield.y, ptUTS.y, offsetHover.y],
+            x: [ptProp.x, ptYield.x, ptUTS.x],
+            y: [ptProp.y, ptYield.y, ptUTS.y],
             mode: 'markers',
             marker: { size: 10 },
             text: [
                 "<b>Proportional (Elastic) Limit</b><br>Last point of linear behavior",
                 "<b>Yield Strength</b><br>Permanent plastic deformation begins",
-                "<b>Ultimate Tensile Strength</b><br>Maximum engineering stress",
-                "<b>0.2% Offset Method</b><br>Line parallel to elastic slope, shifted by ε = 0.002"
+                "<b>Ultimate Tensile Strength</b><br>Maximum engineering stress"
             ],
             hovertemplate: '%{text}<extra></extra>',
             name: 'Key Points'
