@@ -1,199 +1,179 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Engineering Stress–Strain (Mild Carbon Steel)</title>
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
-            background-color: #f3f4f6;
-            color: #111827;
-        }
-        h1 {
-            text-align: center;
-            margin-bottom: 6px;
-        }
-        p {
-            text-align: center;
-            color: #374151;
-            margin-top: 0;
-        }
-        .plot-wrap {
-            max-width: 1050px;
-            margin: 0 auto 22px;
-            background: white;
-            border-radius: 14px;
-            padding: 18px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-        }
-        #curveMain, #curveZoom {
-            width: 100%;
-            height: 560px;
-        }
-        a {
-            display: block;
-            text-align: center;
-            margin-top: 18px;
-            color: #4f46e5;
-            text-decoration: none;
-        }
-        .hint {
-            font-size: 13px;
-            text-align: center;
-            color: #6b7280;
-            margin: 10px 0 0;
-        }
-    </style>
+<meta charset="UTF-8">
+<title>Engineering Stress–Strain Curve (Mild Carbon Steel)</title>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
+
 <body>
-
-<h1>Engineering Stress–Strain (Mild Carbon Steel)</h1>
-<p>Hover over the points to identify material properties.</p>
-
-<div class="plot-wrap">
-    <div id="curveMain"></div>
-    <div class="hint">Tip: Hover over the markers to see what each point represents.</div>
-</div>
-
-<div class="plot-wrap">
-    <div id="curveZoom"></div>
-    <div class="hint">Zoomed view shows early elastic behavior and offset method.</div>
-</div>
-
-<a href="index.html">← Back to Home</a>
+<div id="plot" style="width:100%;height:850px;"></div>
 
 <script>
-/* -----------------------------
-   Material constants
------------------------------ */
-const E = 200000; // MPa
-const sigma_y = 225;
-const sigma_uts = 430;
-const eps_prop = 0.0011;
-const sigma_prop = E * eps_prop;
-const eps_y = 0.003125;
+// -------------------- Material Properties --------------------
+const E = 200000;            // MPa (Elastic Modulus)
+const yieldStress = 225;     // MPa
+const yieldStrain = yieldStress / E;
+const fractureStrain = 0.25;
+const ultimateStress = 400;
 
-/* -----------------------------
-   Stress–strain curve
------------------------------ */
-const curve = [
-    {x: 0.0, y: 0},
-    {x: eps_prop, y: sigma_prop},
-    {x: eps_y, y: sigma_y},
-    {x: 0.010, y: 255},
-    {x: 0.030, y: 310},
-    {x: 0.070, y: 380},
-    {x: 0.120, y: sigma_uts},
-    {x: 0.180, y: 410},
-    {x: 0.250, y: 340}
-];
+// -------------------- Stress–Strain Curve --------------------
+function stressStrain(e) {
+  if (e <= yieldStrain * 0.95) return E * e;
+  if (e <= yieldStrain) return yieldStress * (0.95 + 0.05 * (e / yieldStrain));
+  if (e <= 0.15) return yieldStress + (ultimateStress - yieldStress) * ((e - yieldStrain) / (0.15 - yieldStrain));
+  return ultimateStress * (1 - (e - 0.15) / (fractureStrain - 0.15));
+}
 
-/* -----------------------------
-   0.2% offset line (stops at yield)
------------------------------ */
-function offsetLine(e0, e1, step) {
-    const xs = [], ys = [];
-    for (let e = e0; e <= e1; e += step) {
-        const y = E * (e - 0.002);
-        if (y <= sigma_y) {
-            xs.push(e);
-            ys.push(y);
-        }
+const strain = [], stress = [];
+for (let e = 0; e <= fractureStrain; e += 0.0005) {
+  strain.push(e);
+  stress.push(stressStrain(e));
+}
+
+// -------------------- Offset Line (Stops at Yield) --------------------
+const offsetX = [], offsetY = [];
+for (let e = 0.002; e <= 0.01; e += 0.0001) {
+  const s = E * (e - 0.002);
+  if (s >= yieldStress) break;
+  offsetX.push(e);
+  offsetY.push(s);
+}
+
+// -------------------- Toughness Shading --------------------
+const toughnessArea = {
+  x: [...strain, fractureStrain, 0],
+  y: [...stress, 0, 0],
+  fill: "toself",
+  fillcolor: "rgba(255,165,0,0.25)",
+  line: { width: 0 },
+  name: "Tensile Toughness",
+  hoverinfo: "skip"
+};
+
+// -------------------- Modulus of Resilience Shading --------------------
+const resilienceStrain = [], resilienceStress = [];
+for (let e = 0; e <= yieldStrain; e += 0.0005) {
+  resilienceStrain.push(e);
+  resilienceStress.push(stressStrain(e));
+}
+
+const resilienceArea = {
+  x: [...resilienceStrain, yieldStrain, 0],
+  y: [...resilienceStress, 0, 0],
+  fill: "toself",
+  fillcolor: "rgba(0,150,255,0.25)",
+  line: { width: 0 },
+  name: "Modulus of Resilience",
+  hoverinfo: "skip"
+};
+
+// -------------------- Main Curve --------------------
+const mainCurve = {
+  x: strain,
+  y: stress,
+  mode: "lines",
+  name: "Stress–Strain Curve",
+  line: { color: "black", width: 3 }
+};
+
+// -------------------- Offset Line --------------------
+const offsetLine = {
+  x: offsetX,
+  y: offsetY,
+  mode: "lines",
+  name: "0.2% Offset Line",
+  line: { color: "green", dash: "dash" }
+};
+
+// -------------------- Ductility Line --------------------
+const ductilityLine = {
+  x: [fractureStrain, fractureStrain],
+  y: [0, ultimateStress],
+  mode: "lines",
+  name: "Ductility",
+  line: { color: "purple", dash: "dot" }
+};
+
+// -------------------- Annotation Points --------------------
+const points = {
+  x: [
+    yieldStrain,                        // Yield
+    fractureStrain,                     // Ductility (x-axis)
+    0.125,                              // Toughness label
+    yieldStrain / 2,                    // Resilience label
+    0.007,                              // Elastic Modulus on offset line (moved up)
+    fractureStrain,                     // Elastic Modulus on ductility
+    0.003                               // Elastic Modulus on proportional region
+  ],
+  y: [
+    yieldStress,
+    0,
+    150,
+    110,
+    E * (0.007 - 0.002),
+    ultimateStress / 2,
+    E * 0.003
+  ],
+  text: [
+    "Yield Strength<br>Start of Plastic Deformation",
+    "Ductility<br>Fracture Strain",
+    "Tensile Toughness<br>Energy to Fracture",
+    "Modulus of Resilience<br>Elastic Energy Storage",
+    "Slope = Elastic Modulus",
+    "Slope = Elastic Modulus",
+    "Slope = Elastic Modulus"
+  ],
+  mode: "markers",
+  marker: {
+    size: 10,
+    color: [
+      "red",
+      "purple",
+      "orange",
+      "rgb(0,150,255)",
+      "green",
+      "purple",
+      "black"
+    ]
+  },
+  hoverinfo: "text",
+  name: "Key Points"
+};
+
+// -------------------- Layout --------------------
+const layout = {
+  title: "Engineering Stress–Strain Curve (Mild Carbon Steel)",
+  grid: { rows: 2, columns: 1, pattern: "independent" },
+
+  xaxis: { title: "Strain" },
+  yaxis: { title: "Stress (MPa)" },
+
+  xaxis2: { title: "Strain (Zoomed Elastic Region)", range: [0, 0.01] },
+  yaxis2: { title: "Stress (MPa)", range: [0, 300] },
+
+  annotations: [
+    {
+      text: "<b>Zoomed-In Elastic Region</b>",
+      xref: "paper",
+      yref: "paper",
+      x: 0.5,
+      y: 0.47,
+      showarrow: false,
+      font: { size: 14 }
     }
-    return { xs, ys };
-}
-const offset = offsetLine(0.002, 0.008, 0.00005);
-
-/* -----------------------------
-   Key points
------------------------------ */
-const ptProp = { x: eps_prop, y: sigma_prop };
-const ptYield = { x: eps_y, y: sigma_y };
-const ptUTS = { x: 0.120, y: sigma_uts };
-const ptFrac = { x: 0.250, y: 340 };
-
-/* -----------------------------
-   Traces
------------------------------ */
-const curveTrace = {
-    x: curve.map(p => p.x),
-    y: curve.map(p => p.y),
-    mode: 'lines',
-    line: { width: 4 },
-    hoverinfo: 'skip'
+  ]
 };
 
-const offsetTrace = {
-    x: offset.xs,
-    y: offset.ys,
-    mode: 'lines',
-    line: { dash: 'dash', width: 2, color: 'green' },
-    hoverinfo: 'skip'
-};
-
-const pointsTrace = {
-    x: [ptProp.x, ptYield.x, ptUTS.x, ptFrac.x],
-    y: [ptProp.y, ptYield.y, ptUTS.y, ptFrac.y],
-    mode: 'markers',
-    marker: { size: 10, color: 'red' },
-    text: [
-        `<b>Proportional Limit</b><br>End of linear elasticity`,
-        `<b>Yield Strength</b><br>Plastic deformation begins`,
-        `<b>Ultimate Tensile Strength</b><br>Maximum stress`,
-        `<b>Fracture</b><br>Material failure`
-    ],
-    hovertemplate: '%{text}<extra></extra>'
-};
-
-/* -----------------------------
-   Layouts
------------------------------ */
-function mainLayout() {
-    return {
-        xaxis: { title: 'Strain, ε (in/in)', range: [0, 0.27] },
-        yaxis: { title: 'Stress, σ (MPa)', range: [0, 500] },
-        margin: { t: 30, l: 70, r: 20, b: 70 },
-        showlegend: false
-    };
-}
-
-function zoomLayout() {
-    return {
-        xaxis: { title: 'Strain, ε (in/in)', range: [0, 0.01] },
-        yaxis: { title: 'Stress, σ (MPa)', range: [0, 500] },
-        margin: { t: 60, l: 70, r: 20, b: 70 },
-        showlegend: false,
-
-        
-        annotations: [{
-            text: "<b>Zoomed-In Elastic Region</b>",
-            xref: "paper",
-            yref: "paper",
-            x: 0.5,
-            y: 1.15,
-            showarrow: false,
-            font: { size: 16 }
-        }]
-    };
-}
-
-/* -----------------------------
-   Render plots
------------------------------ */
-Plotly.newPlot('curveMain',
-    [curveTrace, offsetTrace, pointsTrace],
-    mainLayout(),
-    { responsive: true }
-);
-
-Plotly.newPlot('curveZoom',
-    [curveTrace, offsetTrace, pointsTrace],
-    zoomLayout(),
-    { responsive: true }
-);
+// -------------------- Render --------------------
+Plotly.newPlot("plot", [
+  toughnessArea,
+  resilienceArea,
+  mainCurve,
+  offsetLine,
+  ductilityLine,
+  points
+], layout);
 </script>
-
 </body>
 </html>
