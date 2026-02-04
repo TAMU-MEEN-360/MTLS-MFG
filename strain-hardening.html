@@ -59,236 +59,141 @@
 
 <div class="plot-wrap">
     <div id="curveZoom"></div>
-    <div class="hint">Zoomed view shows the 0.2% offset line and early-region properties more clearly.</div>
+    <div class="hint">Zoomed view shows early elastic behavior and offset method.</div>
 </div>
 
 <a href="index.html">← Back to Home</a>
 
 <script>
-    const E = 200000;
-    const sigma_y = 225;
-    const sigma_uts = 430;
-    const eps_prop = 0.0011;
-    const sigma_prop = E * eps_prop;
-    const eps_y = 0.003125;
+/* -----------------------------
+   Material constants
+----------------------------- */
+const E = 200000; // MPa
+const sigma_y = 225;
+const sigma_uts = 430;
+const eps_prop = 0.0011;
+const sigma_prop = E * eps_prop;
+const eps_y = 0.003125;
 
-    const curve = [
-        {x: 0.0, y: 0},
-        {x: eps_prop, y: sigma_prop},
-        {x: eps_y, y: sigma_y},
-        {x: 0.010, y: 255},
-        {x: 0.030, y: 310},
-        {x: 0.070, y: 380},
-        {x: 0.120, y: sigma_uts},
-        {x: 0.180, y: 410},
-        {x: 0.250, y: 340}
-    ];
+/* -----------------------------
+   Stress–strain curve
+----------------------------- */
+const curve = [
+    {x: 0.0, y: 0},
+    {x: eps_prop, y: sigma_prop},
+    {x: eps_y, y: sigma_y},
+    {x: 0.010, y: 255},
+    {x: 0.030, y: 310},
+    {x: 0.070, y: 380},
+    {x: 0.120, y: sigma_uts},
+    {x: 0.180, y: 410},
+    {x: 0.250, y: 340}
+];
 
-    function offsetLine(e0, eEnd, step) {
-        const xs = [], ys = [];
-        for (let e = e0; e <= eEnd; e += step) {
+/* -----------------------------
+   0.2% offset line (stops at yield)
+----------------------------- */
+function offsetLine(e0, e1, step) {
+    const xs = [], ys = [];
+    for (let e = e0; e <= e1; e += step) {
+        const y = E * (e - 0.002);
+        if (y <= sigma_y) {
             xs.push(e);
-            ys.push(E * (e - 0.002));
+            ys.push(y);
         }
-        return { xs, ys };
     }
+    return { xs, ys };
+}
+const offset = offsetLine(0.002, 0.008, 0.00005);
 
-    const offset = offsetLine(0.002, eps_y, 0.00005);
+/* -----------------------------
+   Key points
+----------------------------- */
+const ptProp = { x: eps_prop, y: sigma_prop };
+const ptYield = { x: eps_y, y: sigma_y };
+const ptUTS = { x: 0.120, y: sigma_uts };
+const ptFrac = { x: 0.250, y: 340 };
 
-    const ptProp = { x: eps_prop, y: sigma_prop };
-    const ptYield = { x: eps_y, y: sigma_y };
-    const ptUTS = { x: 0.120, y: sigma_uts };
-    const ptFrac = { x: 0.250, y: 340 };
+/* -----------------------------
+   Traces
+----------------------------- */
+const curveTrace = {
+    x: curve.map(p => p.x),
+    y: curve.map(p => p.y),
+    mode: 'lines',
+    line: { width: 4 },
+    hoverinfo: 'skip'
+};
 
-    const hoverTexts = [
-        `<b>Proportional (Elastic) Limit</b><br>
-         Last point of linear behavior<br>
-         ε ≈ ${eps_prop.toFixed(4)}, σ ≈ ${Math.round(sigma_prop)} MPa`,
+const offsetTrace = {
+    x: offset.xs,
+    y: offset.ys,
+    mode: 'lines',
+    line: { dash: 'dash', width: 2, color: 'green' },
+    hoverinfo: 'skip'
+};
 
-        `<b>Yield Strength</b><br>
-         Permanent plastic deformation begins<br>
-         σᵧ ≈ ${sigma_y} MPa, εᵧ ≈ ${eps_y.toFixed(5)}`,
+const pointsTrace = {
+    x: [ptProp.x, ptYield.x, ptUTS.x, ptFrac.x],
+    y: [ptProp.y, ptYield.y, ptUTS.y, ptFrac.y],
+    mode: 'markers',
+    marker: { size: 10, color: 'red' },
+    text: [
+        `<b>Proportional Limit</b><br>End of linear elasticity`,
+        `<b>Yield Strength</b><br>Plastic deformation begins`,
+        `<b>Ultimate Tensile Strength</b><br>Maximum stress`,
+        `<b>Fracture</b><br>Material failure`
+    ],
+    hovertemplate: '%{text}<extra></extra>'
+};
 
-        `<b>Ultimate Tensile Strength (UTS)</b><br>
-         Maximum engineering stress<br>
-         Onset of necking<br>
-         σᵤₜₛ ≈ ${sigma_uts} MPa`,
-
-        `<b>Fracture</b><br>
-         Final failure after necking<br>
-         ε ≈ ${ptFrac.x.toFixed(3)}, σ ≈ ${Math.round(ptFrac.y)} MPa`
-    ];
-
-    // -----------------------------
-    // Tensile Toughness (full area)
-    // -----------------------------
-    const toughnessTrace = {
-        x: curve.map(p => p.x),
-        y: curve.map(p => p.y),
-        mode: 'lines',
-        fill: 'tozeroy',
-        fillcolor: 'rgba(59,130,246,0.15)',
-        line: { width: 0 },
-        hoverinfo: 'skip'
+/* -----------------------------
+   Layouts
+----------------------------- */
+function mainLayout() {
+    return {
+        xaxis: { title: 'Strain, ε (in/in)', range: [0, 0.27] },
+        yaxis: { title: 'Stress, σ (MPa)', range: [0, 500] },
+        margin: { t: 30, l: 70, r: 20, b: 70 },
+        showlegend: false
     };
+}
 
-    const toughnessLabel = {
-        x: [0.12],
-        y: [200],
-        mode: 'markers',
-        marker: { size: 12, color: 'rgba(59,130,246,0.6)' },
-        text: ['<b>Tensile Toughness</b><br>Total energy absorbed to fracture'],
-        hovertemplate: '%{text}<extra></extra>'
+function zoomLayout() {
+    return {
+        xaxis: { title: 'Strain, ε (in/in)', range: [0, 0.01] },
+        yaxis: { title: 'Stress, σ (MPa)', range: [0, 500] },
+        margin: { t: 60, l: 70, r: 20, b: 70 },
+        showlegend: false,
+
+        
+        annotations: [{
+            text: "<b>Zoomed-In Elastic Region</b>",
+            xref: "paper",
+            yref: "paper",
+            x: 0.5,
+            y: 1.15,
+            showarrow: false,
+            font: { size: 16 }
+        }]
     };
+}
 
-    // -----------------------------
-    // Modulus of Resilience (elastic area)
-    // -----------------------------
-    const resilienceCurve = curve.filter(p => p.x <= eps_y);
+/* -----------------------------
+   Render plots
+----------------------------- */
+Plotly.newPlot('curveMain',
+    [curveTrace, offsetTrace, pointsTrace],
+    mainLayout(),
+    { responsive: true }
+);
 
-    const resilienceTrace = {
-        x: resilienceCurve.map(p => p.x),
-        y: resilienceCurve.map(p => p.y),
-        mode: 'lines',
-        fill: 'tozeroy',
-        fillcolor: 'rgba(245,158,11,0.25)',
-        line: { width: 0 },
-        hoverinfo: 'skip'
-    };
-
-    const resilienceLabel = {
-        x: [eps_y / 2],
-        y: [sigma_y / 2],
-        mode: 'markers',
-        marker: { size: 12, color: 'rgba(245,158,11,0.8)' },
-        text: ['<b>Modulus of Resilience</b><br>Elastic energy absorbed up to yield'],
-        hovertemplate: '%{text}<extra></extra>'
-    };
-
-    // -----------------------------
-    // Fracture / Ductility line
-    // -----------------------------
-    const epsDuctility = ptFrac.x - ptFrac.y / E;
-
-    const fractureSlopeTrace = {
-        x: [epsDuctility, ptFrac.x],
-        y: [0, ptFrac.y],
-        mode: 'lines',
-        line: { dash: 'dot', width: 2, color: 'purple' },
-        hoverinfo: 'skip'
-    };
-
-    const fractureSlopeLabel = {
-        x: [(epsDuctility + ptFrac.x) / 2],
-        y: [ptFrac.y / 2],
-        mode: 'markers',
-        marker: { size: 10, color: 'purple' },
-        text: ['<b>Slope = Elastic Modulus (E)</b>'],
-        hovertemplate: '%{text}<extra></extra>'
-    };
-
-    const ductilityPointTrace = {
-        x: [epsDuctility],
-        y: [0],
-        mode: 'markers',
-        marker: { size: 10, color: 'purple' },
-        text: [`<b>Ductility</b><br>ε ≈ ${epsDuctility.toFixed(3)}`],
-        hovertemplate: '%{text}<extra></extra>'
-    };
-
-    // -----------------------------
-    // Offset-line elastic modulus label
-    // -----------------------------
-    const epsOffsetMid = (0.002 + eps_y) / 2;
-    const sigmaOffsetMid = E * (epsOffsetMid - 0.002);
-
-    const offsetSlopeLabel = {
-        x: [epsOffsetMid],
-        y: [sigmaOffsetMid],
-        mode: 'markers',
-        marker: { size: 10, color: 'green' },
-        text: ['<b>Slope = Elastic Modulus (E)</b>'],
-        hovertemplate: '%{text}<extra></extra>'
-    };
-
-    const propSlopeLabel = {
-        x: [0.0007],
-        y: [E * 0.0007],
-        mode: 'markers',
-        marker: { size: 10, color: 'red' },
-        text: ['<b>Slope = Elastic Modulus (E)</b>'],
-        hovertemplate: '%{text}<extra></extra>'
-    };
-
-    const curveTrace = {
-        x: curve.map(p => p.x),
-        y: curve.map(p => p.y),
-        mode: 'lines',
-        line: { width: 4 },
-        hoverinfo: 'skip'
-    };
-
-    const offsetTrace = {
-        x: offset.xs,
-        y: offset.ys,
-        mode: 'lines',
-        line: { dash: 'dash', width: 2, color: 'green' },
-        hoverinfo: 'skip'
-    };
-
-    const pointsTrace = {
-        x: [ptProp.x, ptYield.x, ptUTS.x, ptFrac.x],
-        y: [ptProp.y, ptYield.y, ptUTS.y, ptFrac.y],
-        mode: 'markers',
-        marker: { size: 10, color: 'red' },
-        text: hoverTexts,
-        hovertemplate: '%{text}<extra></extra>'
-    };
-
-    function layout(zoom) {
-        return {
-            xaxis: { title: 'Strain, ε', range: zoom ? [0, 0.01] : [0, 0.27] },
-            yaxis: { title: 'Stress, σ (MPa)', range: [0, 500] },
-            margin: { t: 30, l: 70, r: 20, b: 70 },
-            showlegend: false
-        };
-    }
-
-    Plotly.newPlot(
-        'curveMain',
-        [
-            resilienceTrace,
-            toughnessTrace,
-            curveTrace,
-            offsetTrace,
-            fractureSlopeTrace,
-            resilienceLabel,
-            toughnessLabel,
-            fractureSlopeLabel,
-            ductilityPointTrace,
-            offsetSlopeLabel,
-            propSlopeLabel,
-            pointsTrace
-        ],
-        layout(false),
-        { responsive: true }
-    );
-
-    Plotly.newPlot(
-        'curveZoom',
-        [
-            resilienceTrace,
-            curveTrace,
-            offsetTrace,
-            fractureSlopeTrace,
-            resilienceLabel,
-            offsetSlopeLabel,
-            propSlopeLabel,
-            pointsTrace
-        ],
-        layout(true),
-        { responsive: true }
-    );
+Plotly.newPlot('curveZoom',
+    [curveTrace, offsetTrace, pointsTrace],
+    zoomLayout(),
+    { responsive: true }
+);
 </script>
+
 </body>
 </html>
