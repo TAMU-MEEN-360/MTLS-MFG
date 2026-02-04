@@ -48,169 +48,181 @@
     </style>
 </head>
 <body>
-    <h1>Engineering Stress–Strain (Mild Carbon Steel)</h1>
-    <p>Hover over the points to identify material properties.</p>
+<h1>Engineering Stress–Strain (Mild Carbon Steel)</h1>
+<p>Hover over the points to identify material properties.</p>
 
-    <div class="plot-wrap">
-        <div id="curveMain"></div>
-        <div class="hint">Tip: Hover over the markers to see what each point represents.</div>
-    </div>
+<div class="plot-wrap">
+    <div id="curveMain"></div>
+    <div class="hint">Tip: Hover over the markers to see what each point represents.</div>
+</div>
 
-    <div class="plot-wrap">
-        <div id="curveZoom"></div>
-        <div class="hint">Zoomed view shows the 0.2% offset line and early-region properties more clearly.</div>
-    </div>
+<div class="plot-wrap">
+    <div id="curveZoom"></div>
+    <div class="hint">Zoomed view shows the 0.2% offset line and early-region properties more clearly.</div>
+</div>
 
-    <a href="index.html">← Back to Home</a>
+<a href="index.html">← Back to Home</a>
 
-    <script>
-        // -----------------------------
-        // Material constants (typical A36)
-        // -----------------------------
-        const E = 200000; // MPa
-        const sigma_y = 225; // MPa
-        const sigma_uts = 430; // MPa
-        const eps_prop = 0.0011;
-        const sigma_prop = E * eps_prop;
-        const eps_y = 0.003125;
+<script>
+    const E = 200000;
+    const sigma_y = 225;
+    const sigma_uts = 430;
+    const eps_prop = 0.0011;
+    const sigma_prop = E * eps_prop;
+    const eps_y = 0.003125;
 
-        // -----------------------------
-        // Stress–strain curve (illustrative)
-        // -----------------------------
-        const curve = [
-            {x: 0.0, y: 0},
-            {x: eps_prop, y: sigma_prop},
-            {x: eps_y, y: sigma_y},
-            {x: 0.010, y: 255},
-            {x: 0.030, y: 310},
-            {x: 0.070, y: 380},
-            {x: 0.120, y: sigma_uts},
-            {x: 0.180, y: 410},
-            {x: 0.250, y: 340} // fracture point
-        ];
+    const curve = [
+        {x: 0.0, y: 0},
+        {x: eps_prop, y: sigma_prop},
+        {x: eps_y, y: sigma_y},
+        {x: 0.010, y: 255},
+        {x: 0.030, y: 310},
+        {x: 0.070, y: 380},
+        {x: 0.120, y: sigma_uts},
+        {x: 0.180, y: 410},
+        {x: 0.250, y: 340}
+    ];
 
-        // -----------------------------
-        // 0.2% offset line (NO hover)
-        // -----------------------------
-        function offsetLine(e0, e1, step) {
-            const xs = [], ys = [];
-            for (let e = e0; e <= e1; e += step) {
-                xs.push(e);
-                ys.push(E * (e - 0.002));
-            }
-            return { xs, ys };
+    function offsetLine(e0, e1, step) {
+        const xs = [], ys = [];
+        for (let e = e0; e <= e1; e += step) {
+            xs.push(e);
+            ys.push(E * (e - 0.002));
         }
-        const offset = offsetLine(0.002, 0.008, 0.00005);
+        return { xs, ys };
+    }
+    const offset = offsetLine(0.002, 0.008, 0.00005);
 
-        // -----------------------------
-        // Key points with hover info
-        // -----------------------------
-        const ptProp = { x: eps_prop, y: sigma_prop };
-        const ptYield = { x: eps_y, y: sigma_y };
-        const ptUTS = { x: 0.120, y: sigma_uts };
-        const ptFrac = { x: 0.250, y: 340 };
+    const ptProp = { x: eps_prop, y: sigma_prop };
+    const ptYield = { x: eps_y, y: sigma_y };
+    const ptUTS = { x: 0.120, y: sigma_uts };
+    const ptFrac = { x: 0.250, y: 340 };
 
-        const hoverTexts = [
-            `<b>Proportional (Elastic) Limit</b><br>Last point of linear behavior<br>ε ≈ ${eps_prop.toFixed(4)}, σ ≈ ${Math.round(sigma_prop)} MPa`,
-            `<b>Yield Strength</b><br>Permanent plastic deformation begins<br>σ_y ≈ ${sigma_y} MPa, ε_y ≈ ${eps_y.toFixed(5)}`,
-            `<b>Ultimate Tensile Strength (UTS)</b><br>Maximum engineering stress<br>Onset of necking<br>σ_uts ≈ ${sigma_uts} MPa`,
-            `<b>Fracture</b><br>Final failure after necking<br>ε ≈ ${ptFrac.x.toFixed(3)}, σ ≈ ${Math.round(ptFrac.y)} MPa`
-        ];
+    const toughnessTrace = {
+        x: curve.map(p => p.x),
+        y: curve.map(p => p.y),
+        mode: 'lines',
+        fill: 'tozeroy',
+        fillcolor: 'rgba(59,130,246,0.15)',
+        line: { width: 0 },
+        hoverinfo: 'skip'
+    };
 
-        // -----------------------------
-        // Tensile toughness (area under curve)
-        // -----------------------------
-        const toughnessTrace = {
-            x: curve.map(p => p.x),
-            y: curve.map(p => p.y),
-            mode: 'lines',
-            fill: 'tozeroy',
-            fillcolor: 'rgba(59,130,246,0.15)',
-            line: { width: 0 },
-            hoverinfo: 'skip',
-            name: 'Tensile Toughness'
+    const toughnessLabel = {
+        x: [0.12],
+        y: [200],
+        mode: 'markers',
+        marker: { size: 12, color: 'rgba(59,130,246,0.6)' },
+        text: ['<b>Tensile Toughness</b><br>Area under stress–strain curve'],
+        hovertemplate: '%{text}<extra></extra>'
+    };
+
+    const epsDuctility = ptFrac.x - ptFrac.y / E;
+
+    const fractureSlopeTrace = {
+        x: [epsDuctility, ptFrac.x],
+        y: [0, ptFrac.y],
+        mode: 'lines',
+        line: { dash: 'dot', width: 2, color: 'purple' },
+        hoverinfo: 'skip'
+    };
+
+    const fractureSlopeLabel = {
+        x: [(epsDuctility + ptFrac.x) / 2],
+        y: [ptFrac.y / 2],
+        mode: 'markers',
+        marker: { size: 10, color: 'purple' },
+        text: ['<b>Slope = Elastic Modulus (E)</b>'],
+        hovertemplate: '%{text}<extra></extra>'
+    };
+
+    const offsetSlopeLabel = {
+        x: [0.0045],
+        y: [E * (0.0045 - 0.002)],
+        mode: 'markers',
+        marker: { size: 10, color: 'green' },
+        text: ['<b>Slope = Elastic Modulus (E)</b>'],
+        hovertemplate: '%{text}<extra></extra>'
+    };
+
+    const propSlopeLabel = {
+        x: [0.0007],
+        y: [E * 0.0007],
+        mode: 'markers',
+        marker: { size: 10, color: 'red' },
+        text: ['<b>Slope = Elastic Modulus (E)</b>'],
+        hovertemplate: '%{text}<extra></extra>'
+    };
+
+    const curveTrace = {
+        x: curve.map(p => p.x),
+        y: curve.map(p => p.y),
+        mode: 'lines',
+        line: { width: 4 },
+        hoverinfo: 'skip'
+    };
+
+    const offsetTrace = {
+        x: offset.xs,
+        y: offset.ys,
+        mode: 'lines',
+        line: { dash: 'dash', width: 2, color: 'green' },
+        hoverinfo: 'skip'
+    };
+
+    const pointsTrace = {
+        x: [ptProp.x, ptYield.x, ptUTS.x, ptFrac.x],
+        y: [ptProp.y, ptYield.y, ptUTS.y, ptFrac.y],
+        mode: 'markers',
+        marker: { size: 10, color: 'red' },
+        text: [
+            '<b>Proportional Limit</b>',
+            '<b>Yield Strength</b>',
+            '<b>Ultimate Tensile Strength</b>',
+            '<b>Fracture</b>'
+        ],
+        hovertemplate: '%{text}<extra></extra>'
+    };
+
+    function layout(zoom) {
+        return {
+            xaxis: { title: 'Strain, ε', range: zoom ? [0, 0.01] : [0, 0.27] },
+            yaxis: { title: 'Stress, σ (MPa)', range: [0, 500] },
+            margin: { t: 30, l: 70, r: 20, b: 70 },
+            showlegend: false
         };
+    }
 
-        // -----------------------------
-        // Elastic-slope line through fracture
-        // -----------------------------
-        const epsDuctility = ptFrac.x - ptFrac.y / E;
+    Plotly.newPlot(
+        'curveMain',
+        [
+            toughnessTrace,
+            curveTrace,
+            offsetTrace,
+            fractureSlopeTrace,
+            toughnessLabel,
+            fractureSlopeLabel,
+            offsetSlopeLabel,
+            propSlopeLabel,
+            pointsTrace
+        ],
+        layout(false),
+        { responsive: true }
+    );
 
-        const fractureSlopeTrace = {
-            x: [epsDuctility, ptFrac.x],
-            y: [0, ptFrac.y],
-            mode: 'lines',
-            line: { dash: 'dot', width: 2, color: 'purple' },
-            hoverinfo: 'skip',
-            name: 'Elastic Slope Through Fracture'
-        };
-
-        const ductilityPointTrace = {
-            x: [epsDuctility],
-            y: [0],
-            mode: 'markers',
-            marker: { size: 10, color: 'purple' },
-            text: [`<b>Ductility</b><br>ε ≈ ${epsDuctility.toFixed(3)}`],
-            hovertemplate: '%{text}<extra></extra>',
-            name: 'Ductility'
-        };
-
-        // -----------------------------
-        // Traces
-        // -----------------------------
-        const curveTrace = {
-            x: curve.map(p => p.x),
-            y: curve.map(p => p.y),
-            mode: 'lines',
-            line: { width: 4 },
-            hoverinfo: 'skip',
-            name: 'Stress–Strain Curve'
-        };
-
-        const offsetTrace = {
-            x: offset.xs,
-            y: offset.ys,
-            mode: 'lines',
-            line: { dash: 'dash', width: 2, color: 'green' },
-            hoverinfo: 'skip',
-            name: '0.2% Offset Line'
-        };
-
-        const pointsTrace = {
-            x: [ptProp.x, ptYield.x, ptUTS.x, ptFrac.x],
-            y: [ptProp.y, ptYield.y, ptUTS.y, ptFrac.y],
-            mode: 'markers',
-            marker: { size: 10, color: 'red' },
-            text: hoverTexts,
-            hovertemplate: '%{text}<extra></extra>',
-            name: 'Key Points'
-        };
-
-        function layout(zoom) {
-            return {
-                xaxis: { title: 'Strain, ε (in/in)', range: zoom ? [0, 0.01] : [0, 0.27] },
-                yaxis: { title: 'Stress, σ (MPa)', range: [0, 500] },
-                margin: { t: 30, l: 70, r: 20, b: 70 },
-                showlegend: false
-            };
-        }
-
-        // -----------------------------
-        // Render plots
-        // -----------------------------
-        Plotly.newPlot(
-            'curveMain',
-            [toughnessTrace, curveTrace, offsetTrace, fractureSlopeTrace, ductilityPointTrace, pointsTrace],
-            layout(false),
-            { responsive: true }
-        );
-
-        Plotly.newPlot(
-            'curveZoom',
-            [curveTrace, offsetTrace, fractureSlopeTrace, pointsTrace],
-            layout(true),
-            { responsive: true }
-        );
-    </script>
+    Plotly.newPlot(
+        'curveZoom',
+        [
+            curveTrace,
+            offsetTrace,
+            fractureSlopeTrace,
+            offsetSlopeLabel,
+            propSlopeLabel,
+            pointsTrace
+        ],
+        layout(true),
+        { responsive: true }
+    );
+</script>
 </body>
 </html>
