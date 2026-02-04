@@ -1,184 +1,154 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Engineering Stress–Strain Curve</title>
-  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <meta charset="UTF-8">
+    <title>Engineering Stress–Strain (ASTM A36 Steel)</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f3f4f6;
+            color: #111827;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 6px;
+        }
+        p {
+            text-align: center;
+            color: #374151;
+            margin-top: 0;
+        }
+        .plot-wrap {
+            max-width: 1050px;
+            margin: 0 auto 22px;
+            background: white;
+            border-radius: 14px;
+            padding: 18px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        }
+        #curveMain, #curveZoom {
+            width: 100%;
+            height: 560px;
+        }
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 18px;
+            color: #4f46e5;
+            text-decoration: none;
+        }
+    </style>
 </head>
 <body>
+    <h1>Engineering Stress–Strain (ASTM A36 Steel)</h1>
+    <p>Hover over the points to identify material properties.</p>
 
-<div id="plot" style="width:100%;max-width:950px;height:600px;margin:auto;"></div>
+    <div class="plot-wrap">
+        <div id="curveMain"></div>
+    </div>
 
-<script>
-/* -----------------------------
-   Parameters (engineering-style)
-------------------------------*/
-const E = 15000;                 // Young’s modulus (psi, scaled)
-const propLimitStrain = 0.0035;
-const offsetStrain = 0.002;
+    <div class="plot-wrap">
+        <div id="curveZoom"></div>
+    </div>
 
-/* -----------------------------
-   Main stress–strain curve
-------------------------------*/
-let strain = [];
-let stress = [];
+    <a href="index.html">← Back to Home</a>
 
-for (let i = 0; i <= 400; i++) {
-  let e = i * 0.00025;
+    <script>
+        // -----------------------------
+        // Material constants (typical A36)
+        // -----------------------------
+        const E = 200000; // MPa
+        const sigma_y = 250; // MPa
+        const sigma_uts = 430; // MPa
+        const eps_prop = 0.0011;
+        const sigma_prop = E * eps_prop;
+        const eps_y = sigma_y / E;
 
-  let s;
-  if (e <= propLimitStrain) {
-    // Linear elastic region
-    s = E * e;
-  } else if (e <= 0.06) {
-    // Plastic deformation, decreasing slope
-    s = E * propLimitStrain
-        + 25000 * (e - propLimitStrain)
-        - 180000 * Math.pow(e - propLimitStrain, 2);
-  } else {
-    // Necking to fracture
-    s = 40000 - 15000 * (e - 0.06);
-  }
+        // -----------------------------
+        // Stress–strain curve (illustrative)
+        // -----------------------------
+        const curve = [
+            {x: 0.0, y: 0},
+            {x: eps_prop, y: sigma_prop},
+            {x: eps_y, y: sigma_y},
+            {x: 0.010, y: 255},
+            {x: 0.030, y: 310},
+            {x: 0.070, y: 380},
+            {x: 0.120, y: sigma_uts},
+            {x: 0.180, y: 410},
+            {x: 0.250, y: 340}
+        ];
 
-  strain.push(e);
-  stress.push(Math.max(s, 0));
-}
+        // -----------------------------
+        // 0.2% offset line (NO hover)
+        // -----------------------------
+        function offsetLine(e0, e1, step) {
+            const xs = [], ys = [];
+            for (let e = e0; e <= e1; e += step) {
+                xs.push(e);
+                ys.push(E * (e - 0.002));
+            }
+            return { xs, ys };
+        }
+        const offset = offsetLine(0.002, 0.008, 0.00005);
 
-/* -----------------------------
-   0.2% offset line
-------------------------------*/
-let offsetX = [];
-let offsetY = [];
+        // -----------------------------
+        // Key points
+        // -----------------------------
+        const ptProp = { x: eps_prop, y: sigma_prop };
+        const ptYield = { x: eps_y, y: sigma_y };
+        const ptUTS = { x: 0.120, y: sigma_uts };
+        const offsetHover = { x: 0.0065, y: 460 };
 
-for (let i = 0; i <= 400; i++) {
-  let e = i * 0.00025;
-  offsetX.push(e);
-  offsetY.push(E * (e - offsetStrain));
-}
+        // -----------------------------
+        // Traces
+        // -----------------------------
+        const curveTrace = {
+            x: curve.map(p => p.x),
+            y: curve.map(p => p.y),
+            mode: 'lines',
+            line: { width: 4 },
+            hoverinfo: 'skip',
+            name: 'Stress–Strain Curve'
+        };
 
-/* -----------------------------
-   Yield point (intersection)
-------------------------------*/
-let yieldIndex = 0;
-let minDiff = Infinity;
+        const offsetTrace = {
+            x: offset.xs,
+            y: offset.ys,
+            mode: 'lines',
+            line: { dash: 'dash', width: 2, color: 'green' },
+            hoverinfo: 'skip',
+            name: '0.2% Offset Line'
+        };
 
-for (let i = 0; i < strain.length; i++) {
-  let diff = Math.abs(stress[i] - offsetY[i]);
-  if (diff < minDiff) {
-    minDiff = diff;
-    yieldIndex = i;
-  }
-}
+        const pointsTrace = {
+            x: [ptProp.x, ptYield.x, ptUTS.x, offsetHover.x],
+            y: [ptProp.y, ptYield.y, ptUTS.y, offsetHover.y],
+            mode: 'markers',
+            marker: { size: 10 },
+            text: [
+                "<b>Proportional (Elastic) Limit</b><br>Last point of linear behavior",
+                "<b>Yield Strength</b><br>Permanent plastic deformation begins",
+                "<b>Ultimate Tensile Strength</b><br>Maximum engineering stress",
+                "<b>0.2% Offset Method</b><br>Line parallel to elastic slope, shifted by ε = 0.002"
+            ],
+            hovertemplate: '%{text}<extra></extra>',
+            name: 'Key Points'
+        };
 
-const yieldStrain = strain[yieldIndex];
-const yieldStress = stress[yieldIndex];
-const propStress = E * propLimitStrain;
+        function layout(zoom) {
+            return {
+                xaxis: { title: 'Strain, ε (in/in)', range: zoom ? [0, 0.01] : [0, 0.27] },
+                yaxis: { title: 'Stress, σ (MPa)', range: [0, 500] },
+                margin: { t: 30, l: 70, r: 20, b: 70 },
+                showlegend: false
+            };
+        }
 
-/* -----------------------------
-   Ultimate & fracture
-------------------------------*/
-const utsIndex = stress.indexOf(Math.max(...stress));
-const fractureIndex = strain.length - 1;
-
-/* -----------------------------
-   Plot traces
-------------------------------*/
-const curve = {
-  x: strain,
-  y: stress,
-  mode: "lines",
-  line: { width: 3, color: "red" },
-  name: "Stress–Strain Curve"
-};
-
-const offsetLine = {
-  x: offsetX,
-  y: offsetY,
-  mode: "lines",
-  line: { dash: "dash", width: 2, color: "black" },
-  name: "0.2% Offset Line"
-};
-
-const points = {
-  x: [
-    propLimitStrain,
-    yieldStrain,
-    strain[utsIndex],
-    strain[fractureIndex]
-  ],
-  y: [
-    propStress,
-    yieldStress,
-    stress[utsIndex],
-    stress[fractureIndex]
-  ],
-  mode: "markers",
-  marker: { size: 9, color: "black" },
-  text: [
-    "Proportional Limit<br>(end of linear elastic region)",
-    `Yield Strength (0.2% offset)<br>σᵧ ≈ ${yieldStress.toFixed(0)} psi`,
-    "Ultimate Tensile Strength",
-    "Fracture"
-  ],
-  hoverinfo: "text",
-  name: "Key Points"
-};
-
-/* -----------------------------
-   Annotations (textbook style)
-------------------------------*/
-const annotations = [
-  {
-    x: 0.0018,
-    y: 20000,
-    text: "Elastic stretching",
-    showarrow: false
-  },
-  {
-    x: 0.035,
-    y: 37000,
-    text: "Plastic deformation",
-    showarrow: false
-  },
-  {
-    x: yieldStrain,
-    y: yieldStress + 3000,
-    text: "Offset yield strength",
-    arrowhead: 3
-  },
-  {
-    x: 0.095,
-    y: 10000,
-    text: "Strain to failure",
-    showarrow: false
-  }
-];
-
-/* -----------------------------
-   Layout (matches textbook look)
-------------------------------*/
-const layout = {
-  title: "Engineering Stress–Strain Diagram",
-  plot_bgcolor: "#dbe7f3",
-  paper_bgcolor: "white",
-  xaxis: {
-    title: "Engineering strain e (in./in.)",
-    range: [0, 0.14],
-    dtick: 0.02,
-    zeroline: false
-  },
-  yaxis: {
-    title: "Engineering stress s (psi)",
-    range: [0, 45000],
-    dtick: 5000,
-    zeroline: false
-  },
-  annotations: annotations,
-  hovermode: "closest"
-};
-
-Plotly.newPlot("plot", [curve, offsetLine, points], layout);
-</script>
-
+        Plotly.newPlot('curveMain', [curveTrace, offsetTrace, pointsTrace], layout(false), { responsive: true });
+        Plotly.newPlot('curveZoom', [curveTrace, offsetTrace, pointsTrace], layout(true), { responsive: true });
+    </script>
 </body>
 </html>
