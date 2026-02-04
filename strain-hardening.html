@@ -114,16 +114,16 @@
             line: { width: 4 },
             hoverinfo: 'skip',
             name: 'Stress–Strain Curve'
-        //};
+        };
 
-        //const offsetTrace = {
-            //x: offset.xs,
-            //y: offset.ys,
-            //mode: 'lines',
-            //line: { dash: 'dash', width: 2, color: 'green' },
-            //hoverinfo: 'skip',
-            //name: '0.2% Offset Line'
-        //};
+        const offsetTrace = {
+            x: offset.xs,
+            y: offset.ys,
+            mode: 'lines',
+            line: { dash: 'dash', width: 2, color: 'green' },
+            hoverinfo: 'skip',
+            name: '0.2% Offset Line'
+        };
 
         const pointsTrace = {
             x: [ptProp.x, ptYield.x, ptUTS.x, offsetHover.x],
