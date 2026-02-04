@@ -48,6 +48,7 @@
     </style>
 </head>
 <body>
+
 <h1>Engineering Stress–Strain (Mild Carbon Steel)</h1>
 <p>Hover over the points to identify material properties.</p>
 
@@ -83,21 +84,28 @@
         {x: 0.250, y: 340}
     ];
 
-    function offsetLine(e0, e1, step) {
+    // -----------------------------
+    // 0.2% Offset Line (STOP at yield)
+    // -----------------------------
+    function offsetLine(e0, eEnd, step) {
         const xs = [], ys = [];
-        for (let e = e0; e <= e1; e += step) {
+        for (let e = e0; e <= eEnd; e += step) {
             xs.push(e);
             ys.push(E * (e - 0.002));
         }
         return { xs, ys };
     }
-    const offset = offsetLine(0.002, 0.008, 0.00005);
+
+    const offset = offsetLine(0.002, eps_y, 0.00005);
 
     const ptProp = { x: eps_prop, y: sigma_prop };
     const ptYield = { x: eps_y, y: sigma_y };
     const ptUTS = { x: 0.120, y: sigma_uts };
     const ptFrac = { x: 0.250, y: 340 };
 
+    // -----------------------------
+    // Tensile Toughness (Area)
+    // -----------------------------
     const toughnessTrace = {
         x: curve.map(p => p.x),
         y: curve.map(p => p.y),
@@ -117,6 +125,9 @@
         hovertemplate: '%{text}<extra></extra>'
     };
 
+    // -----------------------------
+    // Elastic-slope line through fracture
+    // -----------------------------
     const epsDuctility = ptFrac.x - ptFrac.y / E;
 
     const fractureSlopeTrace = {
@@ -136,15 +147,24 @@
         hovertemplate: '%{text}<extra></extra>'
     };
 
+    // -----------------------------
+    // Elastic modulus label on offset line (CENTERED)
+    // -----------------------------
+    const epsOffsetMid = (0.002 + eps_y) / 2;
+    const sigmaOffsetMid = E * (epsOffsetMid - 0.002);
+
     const offsetSlopeLabel = {
-        x: [0.0045],
-        y: [E * (0.0045 - 0.002)],
+        x: [epsOffsetMid],
+        y: [sigmaOffsetMid],
         mode: 'markers',
         marker: { size: 10, color: 'green' },
         text: ['<b>Slope = Elastic Modulus (E)</b>'],
         hovertemplate: '%{text}<extra></extra>'
     };
 
+    // -----------------------------
+    // Elastic modulus label on proportional region
+    // -----------------------------
     const propSlopeLabel = {
         x: [0.0007],
         y: [E * 0.0007],
@@ -154,6 +174,9 @@
         hovertemplate: '%{text}<extra></extra>'
     };
 
+    // -----------------------------
+    // Main traces
+    // -----------------------------
     const curveTrace = {
         x: curve.map(p => p.x),
         y: curve.map(p => p.y),
