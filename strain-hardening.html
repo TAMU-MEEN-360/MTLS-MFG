@@ -39,6 +39,12 @@
             color: #4f46e5;
             text-decoration: none;
         }
+        .hint {
+            font-size: 13px;
+            text-align: center;
+            color: #6b7280;
+            margin: 10px 0 0;
+        }
     </style>
 </head>
 <body>
@@ -47,10 +53,12 @@
 
     <div class="plot-wrap">
         <div id="curveMain"></div>
+        <div class="hint">Tip: Hover over the markers to see what each point represents.</div>
     </div>
 
     <div class="plot-wrap">
         <div id="curveZoom"></div>
+        <div class="hint">Zoomed view shows the 0.2% offset line and early-region properties more clearly.</div>
     </div>
 
     <a href="index.html">← Back to Home</a>
@@ -60,12 +68,10 @@
         // Material constants (typical A36)
         // -----------------------------
         const E = 200000; // MPa
-        //const sigma_y = 250; // MPa
         const sigma_y = 225; // MPa
         const sigma_uts = 430; // MPa
         const eps_prop = 0.0011;
         const sigma_prop = E * eps_prop;
-        //const eps_y = sigma_y / E;
         const eps_y = 0.003125;
 
         // -----------------------------
@@ -80,7 +86,7 @@
             {x: 0.070, y: 380},
             {x: 0.120, y: sigma_uts},
             {x: 0.180, y: 410},
-            {x: 0.250, y: 340}
+            {x: 0.250, y: 340} // fracture point
         ];
 
         // -----------------------------
@@ -97,12 +103,19 @@
         const offset = offsetLine(0.002, 0.008, 0.00005);
 
         // -----------------------------
-        // Key points
+        // Key points with hover info
         // -----------------------------
         const ptProp = { x: eps_prop, y: sigma_prop };
         const ptYield = { x: eps_y, y: sigma_y };
         const ptUTS = { x: 0.120, y: sigma_uts };
-        //const offsetHover = { x: 0.0065, y: 460 };
+        const ptFrac = { x: 0.250, y: 340 };
+
+        const hoverTexts = [
+            `<b>Proportional (Elastic) Limit</b><br>Last point of linear behavior<br>ε ≈ ${eps_prop.toFixed(4)}, σ ≈ ${Math.round(sigma_prop)} MPa`,
+            `<b>Yield Strength</b><br>Permanent plastic deformation begins<br>σ_y ≈ ${sigma_y} MPa, ε_y ≈ ${eps_y.toFixed(5)}`,
+            `<b>Ultimate Tensile Strength (UTS)</b><br>Maximum engineering stress<br>σ_uts ≈ ${sigma_uts} MPa`,
+            `<b>Fracture</b><br>Final failure after necking<br>ε ≈ ${ptFrac.x.toFixed(3)}, σ ≈ ${Math.round(ptFrac.y)} MPa`
+        ];
 
         // -----------------------------
         // Traces
@@ -126,15 +139,11 @@
         };
 
         const pointsTrace = {
-            x: [ptProp.x, ptYield.x, ptUTS.x],
-            y: [ptProp.y, ptYield.y, ptUTS.y],
+            x: [ptProp.x, ptYield.x, ptUTS.x, ptFrac.x],
+            y: [ptProp.y, ptYield.y, ptUTS.y, ptFrac.y],
             mode: 'markers',
-            marker: { size: 10 },
-            text: [
-                "<b>Proportional (Elastic) Limit</b><br>Last point of linear behavior",
-                "<b>Yield Strength</b><br>Permanent plastic deformation begins",
-                "<b>Ultimate Tensile Strength</b><br>Maximum engineering stress"
-            ],
+            marker: { size: 10, color: 'red' },
+            text: hoverTexts,
             hovertemplate: '%{text}<extra></extra>',
             name: 'Key Points'
         };
@@ -148,8 +157,12 @@
             };
         }
 
+        // -----------------------------
+        // Render plots
+        // -----------------------------
         Plotly.newPlot('curveMain', [curveTrace, offsetTrace, pointsTrace], layout(false), { responsive: true });
         Plotly.newPlot('curveZoom', [curveTrace, offsetTrace, pointsTrace], layout(true), { responsive: true });
+
     </script>
 </body>
 </html>
