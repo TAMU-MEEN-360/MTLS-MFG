@@ -209,8 +209,8 @@
 
     function layout(zoom) {
         return {
-            xaxis: { title: 'Strain, ε', range: zoom ? [0, 0.01] : [0, 0.27] },
-            yaxis: { title: 'Stress, σ (MPa)', range: [0, 500] },
+            xaxis: { title: 'Strain, ε', range: zoom ? [0, 0.025] : [0, 0.27] },
+            yaxis: { title: 'Stress, σ (MPa)', range: [0, 300] },
             margin: { t: 30, l: 70, r: 20, b: 70 },
             showlegend: false
         };
