@@ -113,7 +113,8 @@
         const hoverTexts = [
             `<b>Proportional (Elastic) Limit</b><br>Last point of linear behavior<br>ε ≈ ${eps_prop.toFixed(4)}, σ ≈ ${Math.round(sigma_prop)} MPa`,
             `<b>Yield Strength</b><br>Permanent plastic deformation begins<br>σ_y ≈ ${sigma_y} MPa, ε_y ≈ ${eps_y.toFixed(5)}`,
-            `<b>Ultimate Tensile Strength (UTS)</b><br>Maximum engineering stress<br>σ_uts ≈ ${sigma_uts} MPa`,
+            //`<b>Ultimate Tensile Strength (UTS)</b><br>Maximum engineering stress<br>σ_uts ≈ ${sigma_uts} MPa`,
+            `<b>Ultimate Tensile Strength (UTS)</b><br>Maximum engineering stress<br><br>Onset of necking<br>σ_uts ≈ ${sigma_uts} MPa`,
             `<b>Fracture</b><br>Final failure after necking<br>ε ≈ ${ptFrac.x.toFixed(3)}, σ ≈ ${Math.round(ptFrac.y)} MPa`
         ];
 
