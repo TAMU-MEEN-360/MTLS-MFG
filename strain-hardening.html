@@ -53,11 +53,13 @@
 <p>Hover over the points to identify material properties.</p>
 
 <div class="plot-wrap">
+    <div class="plot-title">Full View</div>
     <div id="curveMain"></div>
     <div class="hint">Tip: Hover over the markers to see what each point represents.</div>
 </div>
 
 <div class="plot-wrap">
+    <div class="plot-title">Zoomed View (Elastic + 0.2% Offset Region)</div>
     <div id="curveZoom"></div>
     <div class="hint">Zoomed view shows the 0.2% offset line and early-region properties more clearly.</div>
 </div>
@@ -183,7 +185,7 @@
         y: [ptFrac.y / 2],
         mode: 'markers',
         marker: { size: 10, color: 'purple' },
-        text: ['<b>Slope = Elastic Modulus (E)</b>'],
+        text: ['<b>Slope = Elastic Modulus (E=200 MPa)</b>'],
         hovertemplate: '%{text}<extra></extra>'
     };
 
@@ -207,7 +209,7 @@
         y: [sigmaOffsetMid],
         mode: 'markers',
         marker: { size: 10, color: 'green' },
-        text: ['<b>Slope = Elastic Modulus (E)</b>'],
+        text: ['<b>Slope = Elastic Modulus (E=200 MPa)</b>'],
         hovertemplate: '%{text}<extra></extra>'
     };
 
@@ -216,7 +218,7 @@
         y: [E * 0.0007],
         mode: 'markers',
         marker: { size: 10, color: 'red' },
-        text: ['<b>Slope = Elastic Modulus (E)</b>'],
+        text: ['<b>Slope = Elastic Modulus (E=200 MPa)</b>'],
         hovertemplate: '%{text}<extra></extra>'
     };
 
