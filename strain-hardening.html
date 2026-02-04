@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Engineering Stress–Strain (ASTM A36 Steel)</title>
+  <title>Engineering Stress–Strain (Conceptual)</title>
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
   <style>
@@ -41,8 +41,8 @@
 
 <body>
 
-<h1>Engineering Stress–Strain (ASTM A36 Steel)</h1>
-<p>Hover over the points to identify material properties.</p>
+<h1>Engineering Stress–Strain (Conceptual Steel Curve)</h1>
+<p>Designed to clearly illustrate proportional limit and 0.2% offset yield.</p>
 
 <div class="plot-wrap">
   <div id="curveMain"></div>
@@ -56,45 +56,55 @@
 
 <script>
   // -----------------------------
-  // Material constants (typical A36)
+  // Material constants (conceptual)
   // -----------------------------
-  const E = 200000;        // MPa
-  const sigma_y = 250;     // MPa
-  const sigma_uts = 430;   // MPa
-
-  const eps_prop = 0.0011;
-  const sigma_prop = E * eps_prop;
-
-  const eps_y = sigma_y / E;
+  const E = 200000; // MPa (elastic slope)
 
   // -----------------------------
-  // Stress–strain curve (illustrative)
+  // Key strain locations (very close together on purpose)
+  // -----------------------------
+  const eps_prop = 0.00118;           // proportional limit
+  const eps_y = 0.00125;              // 0.2% offset yield (intersection)
+
+  const sigma_prop = E * eps_prop;    // still linear
+  const sigma_y = E * (eps_y - 0.002); // definition via offset method
+
+  const sigma_uts = 430;
+
+  // -----------------------------
+  // Stress–strain curve
+  // Linear → slight deviation → yield
   // -----------------------------
   const curve = [
-    {x: 0.0,    y: 0},
-    {x: eps_prop, y: sigma_prop},
-    {x: eps_y,  y: sigma_y},
-    {x: 0.010,  y: 255},
-    {x: 0.030,  y: 310},
-    {x: 0.070,  y: 380},
-    {x: 0.120,  y: sigma_uts},
-    {x: 0.180,  y: 410},
-    {x: 0.250,  y: 340}
+    { x: 0.0,        y: 0 },
+    { x: eps_prop,  y: sigma_prop },
+
+    // slight curvature before yield (nonlinear but close)
+    { x: 0.00121,    y: sigma_prop + 6 },
+    { x: eps_y,     y: sigma_y },
+
+    // post-yield / plastic region
+    { x: 0.010,     y: sigma_y + 10 },
+    { x: 0.030,     y: 310 },
+    { x: 0.070,     y: 380 },
+    { x: 0.120,     y: sigma_uts },
+    { x: 0.180,     y: 410 },
+    { x: 0.250,     y: 340 }
   ];
 
   // -----------------------------
-  // 0.2% offset line (NO hover)
+  // 0.2% offset line (STOP at intersection)
   // -----------------------------
-  function offsetLine(e0, e1, step) {
+  function offsetLine(e0, eEnd, step) {
     const xs = [], ys = [];
-    for (let e = e0; e <= e1; e += step) {
+    for (let e = e0; e <= eEnd; e += step) {
       xs.push(e);
       ys.push(E * (e - 0.002));
     }
     return { xs, ys };
   }
 
-  const offset = offsetLine(0.002, 0.008, 0.00005);
+  const offset = offsetLine(0.002, eps_y, 0.00002);
 
   // -----------------------------
   // Key points
@@ -102,9 +112,6 @@
   const ptProp = { x: eps_prop, y: sigma_prop };
   const ptYield = { x: eps_y, y: sigma_y };
   const ptUTS = { x: 0.120, y: sigma_uts };
-
-  // Offset hover point (far away from curve)
-  const offsetHover = { x: 0.0065, y: 460 };
 
   // -----------------------------
   // Traces
@@ -128,15 +135,14 @@
   };
 
   const pointsTrace = {
-    x: [ptProp.x, ptYield.x, ptUTS.x, offsetHover.x],
-    y: [ptProp.y, ptYield.y, ptUTS.y, offsetHover.y],
+    x: [ptProp.x, ptYield.x, ptUTS.x],
+    y: [ptProp.y, ptYield.y, ptUTS.y],
     mode: 'markers',
     marker: { size: 10 },
     text: [
-      `<b>Proportional (Elastic) Limit</b><br>Last point of linear behavior`,
-      `<b>Yield Strength</b><br>Permanent plastic deformation begins`,
-      `<b>Ultimate Tensile Strength</b><br>Maximum engineering stress`,
-      `<b>0.2% Offset Method</b><br>Line parallel to elastic slope, shifted by ε = 0.002`
+      `<b>Proportional Limit</b><br>Curve first deviates from linear behavior`,
+      `<b>Yield Stress (0.2% Offset)</b><br>Intersection with offset line`,
+      `<b>Ultimate Tensile Strength</b><br>Maximum engineering stress`
     ],
     hovertemplate: '%{text}<extra></extra>',
     name: 'Key Points'
