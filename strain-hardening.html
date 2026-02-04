@@ -100,8 +100,27 @@
     const ptUTS = { x: 0.120, y: sigma_uts };
     const ptFrac = { x: 0.250, y: 340 };
 
+    const hoverTexts = [
+        `<b>Proportional (Elastic) Limit</b><br>
+         Last point of linear behavior<br>
+         ε ≈ ${eps_prop.toFixed(4)}, σ ≈ ${Math.round(sigma_prop)} MPa`,
+
+        `<b>Yield Strength</b><br>
+         Permanent plastic deformation begins<br>
+         σᵧ ≈ ${sigma_y} MPa, εᵧ ≈ ${eps_y.toFixed(5)}`,
+
+        `<b>Ultimate Tensile Strength (UTS)</b><br>
+         Maximum engineering stress<br>
+         Onset of necking<br>
+         σᵤₜₛ ≈ ${sigma_uts} MPa`,
+
+        `<b>Fracture</b><br>
+         Final failure after necking<br>
+         ε ≈ ${ptFrac.x.toFixed(3)}, σ ≈ ${Math.round(ptFrac.y)} MPa`
+    ];
+
     // -----------------------------
-    // Tensile Toughness
+    // Tensile Toughness (full area)
     // -----------------------------
     const toughnessTrace = {
         x: curve.map(p => p.x),
@@ -118,7 +137,31 @@
         y: [200],
         mode: 'markers',
         marker: { size: 12, color: 'rgba(59,130,246,0.6)' },
-        text: ['<b>Tensile Toughness</b><br>Area under stress–strain curve'],
+        text: ['<b>Tensile Toughness</b><br>Total energy absorbed to fracture'],
+        hovertemplate: '%{text}<extra></extra>'
+    };
+
+    // -----------------------------
+    // Modulus of Resilience (elastic area)
+    // -----------------------------
+    const resilienceCurve = curve.filter(p => p.x <= eps_y);
+
+    const resilienceTrace = {
+        x: resilienceCurve.map(p => p.x),
+        y: resilienceCurve.map(p => p.y),
+        mode: 'lines',
+        fill: 'tozeroy',
+        fillcolor: 'rgba(245,158,11,0.25)',
+        line: { width: 0 },
+        hoverinfo: 'skip'
+    };
+
+    const resilienceLabel = {
+        x: [eps_y / 2],
+        y: [sigma_y / 2],
+        mode: 'markers',
+        marker: { size: 12, color: 'rgba(245,158,11,0.8)' },
+        text: ['<b>Modulus of Resilience</b><br>Elastic energy absorbed up to yield'],
         hovertemplate: '%{text}<extra></extra>'
     };
 
@@ -144,7 +187,6 @@
         hovertemplate: '%{text}<extra></extra>'
     };
 
-    // ✅ RESTORED ductility point on x-axis
     const ductilityPointTrace = {
         x: [epsDuctility],
         y: [0],
@@ -155,7 +197,7 @@
     };
 
     // -----------------------------
-    // Offset-line elastic modulus label (centered)
+    // Offset-line elastic modulus label
     // -----------------------------
     const epsOffsetMid = (0.002 + eps_y) / 2;
     const sigmaOffsetMid = E * (epsOffsetMid - 0.002);
@@ -169,9 +211,6 @@
         hovertemplate: '%{text}<extra></extra>'
     };
 
-    // -----------------------------
-    // Proportional-region slope label
-    // -----------------------------
     const propSlopeLabel = {
         x: [0.0007],
         y: [E * 0.0007],
@@ -181,9 +220,6 @@
         hovertemplate: '%{text}<extra></extra>'
     };
 
-    // -----------------------------
-    // Main traces
-    // -----------------------------
     const curveTrace = {
         x: curve.map(p => p.x),
         y: curve.map(p => p.y),
@@ -205,12 +241,7 @@
         y: [ptProp.y, ptYield.y, ptUTS.y, ptFrac.y],
         mode: 'markers',
         marker: { size: 10, color: 'red' },
-        text: [
-            '<b>Proportional Limit</b>',
-            '<b>Yield Strength</b>',
-            '<b>Ultimate Tensile Strength</b>',
-            '<b>Fracture</b>'
-        ],
+        text: hoverTexts,
         hovertemplate: '%{text}<extra></extra>'
     };
 
@@ -226,10 +257,12 @@
     Plotly.newPlot(
         'curveMain',
         [
+            resilienceTrace,
             toughnessTrace,
             curveTrace,
             offsetTrace,
             fractureSlopeTrace,
+            resilienceLabel,
             toughnessLabel,
             fractureSlopeLabel,
             ductilityPointTrace,
@@ -244,10 +277,11 @@
     Plotly.newPlot(
         'curveZoom',
         [
+            resilienceTrace,
             curveTrace,
             offsetTrace,
             fractureSlopeTrace,
-            fractureSlopeLabel,
+            resilienceLabel,
             offsetSlopeLabel,
             propSlopeLabel,
             pointsTrace
