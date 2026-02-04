@@ -84,9 +84,6 @@
         {x: 0.250, y: 340}
     ];
 
-    // -----------------------------
-    // 0.2% Offset Line (STOP at yield)
-    // -----------------------------
     function offsetLine(e0, eEnd, step) {
         const xs = [], ys = [];
         for (let e = e0; e <= eEnd; e += step) {
@@ -104,7 +101,7 @@
     const ptFrac = { x: 0.250, y: 340 };
 
     // -----------------------------
-    // Tensile Toughness (Area)
+    // Tensile Toughness
     // -----------------------------
     const toughnessTrace = {
         x: curve.map(p => p.x),
@@ -126,7 +123,7 @@
     };
 
     // -----------------------------
-    // Elastic-slope line through fracture
+    // Fracture / Ductility line
     // -----------------------------
     const epsDuctility = ptFrac.x - ptFrac.y / E;
 
@@ -147,8 +144,18 @@
         hovertemplate: '%{text}<extra></extra>'
     };
 
+    // ✅ RESTORED ductility point on x-axis
+    const ductilityPointTrace = {
+        x: [epsDuctility],
+        y: [0],
+        mode: 'markers',
+        marker: { size: 10, color: 'purple' },
+        text: [`<b>Ductility</b><br>ε ≈ ${epsDuctility.toFixed(3)}`],
+        hovertemplate: '%{text}<extra></extra>'
+    };
+
     // -----------------------------
-    // Elastic modulus label on offset line (CENTERED)
+    // Offset-line elastic modulus label (centered)
     // -----------------------------
     const epsOffsetMid = (0.002 + eps_y) / 2;
     const sigmaOffsetMid = E * (epsOffsetMid - 0.002);
@@ -163,7 +170,7 @@
     };
 
     // -----------------------------
-    // Elastic modulus label on proportional region
+    // Proportional-region slope label
     // -----------------------------
     const propSlopeLabel = {
         x: [0.0007],
@@ -209,8 +216,8 @@
 
     function layout(zoom) {
         return {
-            xaxis: { title: 'Strain, ε', range: zoom ? [0, 0.025] : [0, 0.27] },
-            yaxis: { title: 'Stress, σ (MPa)', range: [0, 300] },
+            xaxis: { title: 'Strain, ε', range: zoom ? [0, 0.01] : [0, 0.27] },
+            yaxis: { title: 'Stress, σ (MPa)', range: [0, 500] },
             margin: { t: 30, l: 70, r: 20, b: 70 },
             showlegend: false
         };
@@ -225,6 +232,7 @@
             fractureSlopeTrace,
             toughnessLabel,
             fractureSlopeLabel,
+            ductilityPointTrace,
             offsetSlopeLabel,
             propSlopeLabel,
             pointsTrace
@@ -239,6 +247,7 @@
             curveTrace,
             offsetTrace,
             fractureSlopeTrace,
+            fractureSlopeLabel,
             offsetSlopeLabel,
             propSlopeLabel,
             pointsTrace
