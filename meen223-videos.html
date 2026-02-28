@@ -14,19 +14,13 @@
 
         h1 {
             text-align: center;
-            margin-bottom: 10px;
-        }
-
-        p.subtitle {
-            text-align: center;
-            color: #555;
-            margin-bottom: 40px;
         }
 
         .video-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 25px;
+            margin-top: 40px;
         }
 
         .video-card {
@@ -34,19 +28,22 @@
             border-radius: 12px;
             box-shadow: 0 6px 15px rgba(0,0,0,0.08);
             overflow: hidden;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            transition: transform 0.2s ease;
         }
 
         .video-card:hover {
             transform: translateY(-6px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.12);
         }
 
-        .video-card img {
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
-            display: block;
+        .thumbnail-placeholder {
+            height: 160px;
+            background: linear-gradient(135deg, #500000, #800000);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
         }
 
         .video-info {
@@ -55,17 +52,15 @@
 
         .video-info h3 {
             margin: 0 0 12px;
-            font-size: 18px;
         }
 
         .video-info a {
             text-decoration: none;
-            background-color: #500000; /* TAMU maroon vibe */
+            background-color: #500000;
             color: white;
             padding: 8px 14px;
             border-radius: 6px;
             display: inline-block;
-            font-size: 14px;
         }
 
         .video-info a:hover {
@@ -73,43 +68,44 @@
         }
     </style>
 </head>
+
 <body>
 
-    <h1>MEEN 223 Review Videos</h1>
-    <p class="subtitle">Thermodynamics Review Library</p>
+<h1>MEEN 223 Review Videos</h1>
 
-    <div class="video-grid">
+<div class="video-grid">
 
-        <!-- Example Video 1 -->
-        <div class="video-card">
-            <img src="images/energy-balance.jpg" alt="Energy Balance Thumbnail">
-            <div class="video-info">
-                <h3>Energy Balance Review</h3>
-                <a href="videos/energy-balance.mp4" target="_blank">Watch Video</a>
-            </div>
+    <div class="video-card">
+        <div class="thumbnail-placeholder">
+            Energy Balance
         </div>
-
-        <!-- Example Video 2 -->
-        <div class="video-card">
-            <img src="images/first-law.jpg" alt="First Law Thumbnail">
-            <div class="video-info">
-                <h3>First Law of Thermodynamics</h3>
-                <a href="videos/first-law.mp4" target="_blank">Watch Video</a>
-            </div>
+        <div class="video-info">
+            <h3>Energy Balance Review</h3>
+            <a href="#">Watch Video</a>
         </div>
-
-        <!-- Example Video 3 -->
-        <div class="video-card">
-            <img src="images/control-volume.jpg" alt="Control Volume Thumbnail">
-            <div class="video-info">
-                <h3>Control Volume Analysis</h3>
-                <a href="videos/control-volume.mp4" target="_blank">Watch Video</a>
-            </div>
-        </div>
-
-        <!-- Add more videos below by copying one block -->
-
     </div>
+
+    <div class="video-card">
+        <div class="thumbnail-placeholder">
+            First Law
+        </div>
+        <div class="video-info">
+            <h3>First Law of Thermodynamics</h3>
+            <a href="#">Watch Video</a>
+        </div>
+    </div>
+
+    <div class="video-card">
+        <div class="thumbnail-placeholder">
+            Control Volume
+        </div>
+        <div class="video-info">
+            <h3>Control Volume Analysis</h3>
+            <a href="#">Watch Video</a>
+        </div>
+    </div>
+
+</div>
 
 </body>
 </html>
