@@ -1,21 +1,123 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Polymers</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 40px; background-color: #f3f4f6; }
-    h1 { color: #1f2937; }
-    a { color: #4f46e5; text-decoration: none; }
-    a:hover { text-decoration: underline; }
-  </style>
-</head>
-<body>
+<style>
+    body {
+        font-family: 'Segoe UI', sans-serif;
+        margin: 0;
+        background: #f4f6f9;
+        color: #333;
+    }
 
-<h1>Polymers</h1>
-<p>This page is a placeholder. You can add explanations, formulas, and images here.</p>
+    .container {
+        max-width: 1100px;
+        margin: 60px auto;
+        padding: 0 20px;
+    }
 
-<p><a href="index.html">← Back to Home</a></p>
+    h1 {
+        text-align: center;
+        margin-bottom: 10px;
+        font-size: 2.5rem;
+    }
 
-</body>
-</html>
+    .subtitle {
+        text-align: center;
+        color: #666;
+        margin-bottom: 60px;
+    }
+
+    .section {
+        margin-bottom: 60px;
+    }
+
+    .section h2 {
+        margin-bottom: 20px;
+        font-size: 1.6rem;
+        border-left: 5px solid #2c3e50;
+        padding-left: 10px;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 20px;
+    }
+
+    .card {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    }
+
+    .card h3 {
+        margin-top: 0;
+        margin-bottom: 10px;
+        font-size: 1.2rem;
+    }
+
+    .card p {
+        font-size: 0.9rem;
+        color: #555;
+    }
+</style>
+
+<div class="container">
+    <h1>Landon K</h1>
+    <p class="subtitle">Mechanical Engineering Portfolio</p>
+
+    <!-- Controls Section -->
+    <div class="section">
+        <h2>Controls Engineering</h2>
+        <div class="grid">
+            <a href="tank-controller.html" class="card">
+                <h3>PID Tank Controller</h3>
+                <p>Modeled and simulated fluid level control using PID tuning in MATLAB.</p>
+            </a>
+
+            <a href="state-space.html" class="card">
+                <h3>State Space Suspension Model</h3>
+                <p>Derived state-space equations and analyzed pole stability.</p>
+            </a>
+
+            <a href="laplace-sim.html" class="card">
+                <h3>Laplace Transform Simulator</h3>
+                <p>Explored system response using transfer functions.</p>
+            </a>
+        </div>
+    </div>
+
+    <!-- Fluids Section -->
+    <div class="section">
+        <h2>Fluid Mechanics</h2>
+        <div class="grid">
+            <a href="impact-of-jet.html" class="card">
+                <h3>Impact of Jet Experiment</h3>
+                <p>Compared theoretical momentum force predictions to lab results.</p>
+            </a>
+
+            <a href="bernoulli-loss.html" class="card">
+                <h3>Bernoulli Energy Loss Study</h3>
+                <p>Analyzed discrepancies between ideal and real head loss.</p>
+            </a>
+        </div>
+    </div>
+
+    <!-- Design Section -->
+    <div class="section">
+        <h2>Design & CAD</h2>
+        <div class="grid">
+            <a href="engine-component.html" class="card">
+                <h3>Engine Component Redesign</h3>
+                <p>Modeled and optimized mechanical part geometry in CAD.</p>
+            </a>
+        </div>
+    </div>
+
+</div>
