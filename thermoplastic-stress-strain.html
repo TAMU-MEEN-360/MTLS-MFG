@@ -1,191 +1,275 @@
-<script>
-  // ------------------------------------------------------------
-  // Teaching values for a generic ductile thermoplastic
-  // ------------------------------------------------------------
-  const E = 2500;        // MPa (≈ 2.5 GPa)
-  const sigma_y = 35;    // MPa (yield peak)
-  const sigma_uts = 55;  // MPa (ultimate tensile strength)
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Engineering Stress–Strain (Thermoplastic)</title>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background-color: #f3f4f6;
+      color: #111827;
+    }
+    h1 { text-align: center; margin-bottom: 6px; }
+    p  { text-align: center; color: #374151; margin-top: 0; }
 
-  const eps_prop = 0.004;
-  const sigma_prop = E * eps_prop;
+    .plot-wrap {
+      max-width: 1050px;
+      margin: 0 auto 22px;
+      background: white;
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+    #curveMain, #curveZoom { width: 100%; height: 560px; }
 
-  // Yield is the FIRST PEAK (not offset)
-  const eps_y = 0.020;   // 2% strain
+    a {
+      display: block;
+      text-align: center;
+      margin-top: 18px;
+      color: #4f46e5;
+      text-decoration: none;
+    }
+    a:hover { text-decoration: underline; }
 
-  // ------------------------------------------------------------
-  // Engineering stress–strain curve
-  // Shape: elastic → yield peak → drop → plateau → strain hardening → UTS → fracture
-  // ------------------------------------------------------------
-  const curve = [
-    { x: 0.000, y: 0 },
+    .hint {
+      font-size: 13px;
+      text-align: center;
+      color: #6b7280;
+      margin: 10px 0 0;
+    }
+  </style>
+</head>
 
-    // linear elastic
-    { x: eps_prop, y: sigma_prop },
+<body>
+  <h1>Engineering Stress–Strain (Thermoplastic)</h1>
+  <p>Quiz yourself: hover over points/regions to reveal what they represent.</p>
 
-    // YIELD PEAK
-    { x: eps_y, y: sigma_y },
+  <div class="plot-wrap">
+    <div id="curveMain"></div>
+    <div class="hint">Tip: Hover over markers/labels to learn each curve feature (yield, drawing plateau, strain hardening, UTS, fracture).</div>
+  </div>
 
-    // post-yield drop
-    { x: 0.050, y: 28 },
+  <div class="plot-wrap">
+    <div id="curveZoom"></div>
+    <div class="hint">Zoomed view highlights the early elastic region and the yield peak.</div>
+  </div>
 
-    // drawing plateau
-    { x: 0.500, y: 28 },
+  <a href="index.html">← Back to Home</a>
 
-    // strain hardening
-    { x: 1.000, y: 35 },
-    { x: 2.000, y: 45 },
+  <script>
+    // ------------------------------------------------------------
+    // Teaching values for a generic ductile thermoplastic
+    // Yield defined at the PEAK (no 0.2% offset line)
+    // ------------------------------------------------------------
+    const E = 2500;        // MPa (≈ 2.5 GPa)
+    const sigma_y = 35;    // MPa (yield peak)
+    const sigma_uts = 55;  // MPa (ultimate tensile strength)
 
-    // UTS
-    { x: 2.500, y: sigma_uts },
+    const eps_prop = 0.004;
+    const sigma_prop = E * eps_prop;
 
-    // fracture
-    { x: 3.000, y: 50 }
-  ];
+    const eps_y = 0.020;   // 2% strain (yield peak location)
 
-  // Key points
-  const ptProp = { x: eps_prop, y: sigma_prop };
-  const ptYield = { x: eps_y, y: sigma_y };
-  const ptPlateau = { x: 0.500, y: 28 };
-  const ptUTS = { x: 2.500, y: sigma_uts };
-  const ptFrac = { x: 3.000, y: 50 };
+    // Curve points (engineering)
+    // elastic → yield peak → drop → plateau → strain hardening → UTS → fracture
+    const curve = [
+      { x: 0.000, y: 0 },
+      { x: eps_prop, y: sigma_prop },
+      { x: eps_y, y: sigma_y },
+      { x: 0.050, y: 28 },     // post-yield drop
+      { x: 0.500, y: 28 },     // drawing plateau
+      { x: 1.000, y: 35 },     // strain hardening
+      { x: 2.000, y: 45 },
+      { x: 2.500, y: sigma_uts },
+      { x: 3.000, y: 50 }      // fracture
+    ];
 
-  // ------------------------------------------------------------
-  // Hover Text
-  // ------------------------------------------------------------
-  const Ur = (sigma_y * sigma_y) / (2 * E);
+    // Key points
+    const ptProp = { x: eps_prop, y: sigma_prop };
+    const ptYield = { x: eps_y, y: sigma_y };
+    const ptDrop = { x: 0.050, y: 28 };
+    const ptPlateau = { x: 0.500, y: 28 };
+    const ptUTS = { x: 2.500, y: sigma_uts };
+    const ptFrac = { x: 3.000, y: 50 };
 
-  const hoverElastic =
-    `<b>Linear Elastic Region</b><br>` +
-    `Approx Hooke’s Law behavior<br>` +
-    `<b>σ = E·ε</b><br>` +
-    `E ≈ 2–3 GPa typical for thermoplastics`;
+    // Hover text
+    const Ur = (sigma_y * sigma_y) / (2 * E);
 
-  const hoverYield =
-    `<b>Yield Strength (Peak)</b><br>` +
-    `First local maximum in engineering stress<br>` +
-    `σ<sub>y</sub> ≈ <b>${sigma_y} MPa</b><br>` +
-    `ε ≈ <b>${(eps_y*100).toFixed(1)}%</b><br>` +
-    `Necking initiates after this point.`;
+    const hoverElastic =
+      `<b>Linear Elastic Region</b><br>` +
+      `Approx Hooke’s law at small strain<br>` +
+      `<b>σ = E·ε</b><br>` +
+      `E is much lower than steel for thermoplastics`;
 
-  const hoverDrop =
-    `<b>Post-Yield Drop</b><br>` +
-    `Stress decreases as a localized neck forms`;
+    const hoverProp =
+      `<b>Proportional Limit</b><br>` +
+      `Highest stress where σ–ε stays very linear<br>` +
+      `ε ≈ <b>${(eps_prop*100).toFixed(2)}%</b>, σ ≈ <b>${sigma_prop.toFixed(1)} MPa</b>`;
 
-  const hoverPlateau =
-    `<b>Drawing / Neck Propagation</b><br>` +
-    `Engineering stress remains ~constant while neck travels`;
+    const hoverYield =
+      `<b>Yield Strength (Peak)</b><br>` +
+      `First local maximum in engineering stress<br>` +
+      `σ<sub>y</sub> ≈ <b>${sigma_y} MPa</b><br>` +
+      `ε ≈ <b>${(eps_y*100).toFixed(1)}%</b><br>` +
+      `Necking initiates after this point`;
 
-  const hoverHardening =
-    `<b>Strain Hardening</b><br>` +
-    `Chains align and resist further stretching`;
+    const hoverDrop =
+      `<b>Post-Yield Drop</b><br>` +
+      `Stress decreases as a localized neck forms`;
 
-  const hoverUTS =
-    `<b>Ultimate Tensile Strength</b><br>` +
-    `Maximum engineering stress<br>` +
-    `σ ≈ <b>${sigma_uts} MPa</b>`;
+    const hoverPlateau =
+      `<b>Drawing / Neck Propagation (Plateau)</b><br>` +
+      `Engineering stress remains ~constant while the neck travels`;
 
-  const hoverFrac =
-    `<b>Fracture</b><br>` +
-    `Final failure after large plastic deformation`;
+    const hoverHardening =
+      `<b>Strain Hardening</b><br>` +
+      `Chains align and resist further stretching; stress rises again`;
 
-  const hoverResilience =
-    `<b>Modulus of Resilience</b><br>` +
-    `Elastic energy per unit volume up to yield<br>` +
-    `<b>U<sub>r</sub> = σ<sub>y</sub><sup>2</sup> / (2E)</b><br>` +
-    `≈ ${Ur.toFixed(4)} MJ/m³`;
+    const hoverUTS =
+      `<b>Ultimate Tensile Strength (UTS)</b><br>` +
+      `Maximum engineering stress on the curve<br>` +
+      `UTS ≈ <b>${sigma_uts} MPa</b>`;
 
-  const hoverToughness =
-    `<b>Tensile Toughness</b><br>` +
-    `Total energy absorbed to fracture<br>` +
-    `Area under entire curve`;
+    const hoverFrac =
+      `<b>Fracture</b><br>` +
+      `Final failure after large plastic deformation<br>` +
+      `ε ≈ <b>${(ptFrac.x*100).toFixed(0)}%</b>, σ ≈ <b>${ptFrac.y.toFixed(1)} MPa</b>`;
 
-  // ------------------------------------------------------------
-  // Shaded Areas
-  // ------------------------------------------------------------
-  const toughnessTrace = {
-    x: curve.map(p => p.x),
-    y: curve.map(p => p.y),
-    mode: 'lines',
-    fill: 'tozeroy',
-    fillcolor: 'rgba(59,130,246,0.15)',
-    line: { width: 0 },
-    hoverinfo: 'skip'
-  };
+    const hoverResilience =
+      `<b>Modulus of Resilience, U<sub>r</sub></b><br>` +
+      `Elastic energy absorbed per unit volume up to yield<br>` +
+      `<b>U<sub>r</sub> = σ<sub>y</sub><sup>2</sup> / (2E)</b><br>` +
+      `U<sub>r</sub> ≈ <b>${Ur.toFixed(4)} MPa</b> (≈ ${Ur.toFixed(4)} MJ/m³)`;
 
-  const resilienceCurve = curve.filter(p => p.x <= eps_y);
+    const hoverToughness =
+      `<b>Tensile Toughness</b><br>` +
+      `Total energy absorbed per unit volume to fracture<br>` +
+      `Approx = area under the full engineering σ–ε curve`;
 
-  const resilienceTrace = {
-    x: resilienceCurve.map(p => p.x),
-    y: resilienceCurve.map(p => p.y),
-    mode: 'lines',
-    fill: 'tozeroy',
-    fillcolor: 'rgba(245,158,11,0.25)',
-    line: { width: 0 },
-    hoverinfo: 'skip'
-  };
-
-  // ------------------------------------------------------------
-  // Main curve trace
-  // ------------------------------------------------------------
-  const curveTrace = {
-    x: curve.map(p => p.x),
-    y: curve.map(p => p.y),
-    mode: 'lines',
-    line: { width: 4 },
-    hoverinfo: 'skip'
-  };
-
-  const pointsTrace = {
-    x: [ptYield.x, ptPlateau.x, ptUTS.x, ptFrac.x],
-    y: [ptYield.y, ptPlateau.y, ptUTS.y, ptFrac.y],
-    mode: 'markers',
-    marker: { size: 10, color: 'red' },
-    text: [hoverYield, hoverPlateau, hoverUTS, hoverFrac],
-    hovertemplate: '%{text}<extra></extra>'
-  };
-
-  function layout(isZoom) {
-    return {
-      xaxis: {
-        title: 'Engineering Strain, ε (%)',
-        range: isZoom ? [0, 8] : [0, 320],
-        tickformat: '.0f'
-      },
-      yaxis: {
-        title: 'Engineering Stress, σ (MPa)',
-        range: isZoom ? [0, 60] : [0, 70]
-      },
-      margin: { t: 30, l: 70, r: 20, b: 70 },
-      showlegend: false
+    // Shaded areas
+    const toughnessTrace = {
+      x: curve.map(p => p.x),
+      y: curve.map(p => p.y),
+      mode: 'lines',
+      fill: 'tozeroy',
+      fillcolor: 'rgba(59,130,246,0.15)',
+      line: { width: 0 },
+      hoverinfo: 'skip'
     };
-  }
 
-  function toPercentTrace(trace) {
-    const t = JSON.parse(JSON.stringify(trace));
-    if (t.x) t.x = t.x.map(v => v * 100);
-    return t;
-  }
+    const resilienceCurve = curve.filter(p => p.x <= eps_y);
 
-  Plotly.newPlot(
-    'curveMain',
-    [
-      toPercentTrace(resilienceTrace),
-      toPercentTrace(toughnessTrace),
-      toPercentTrace(curveTrace),
-      toPercentTrace(pointsTrace)
-    ],
-    layout(false),
-    { responsive: true }
-  );
+    const resilienceTrace = {
+      x: resilienceCurve.map(p => p.x),
+      y: resilienceCurve.map(p => p.y),
+      mode: 'lines',
+      fill: 'tozeroy',
+      fillcolor: 'rgba(245,158,11,0.25)',
+      line: { width: 0 },
+      hoverinfo: 'skip'
+    };
 
-  Plotly.newPlot(
-    'curveZoom',
-    [
-      toPercentTrace(resilienceTrace),
-      toPercentTrace(curveTrace),
-      toPercentTrace(pointsTrace)
-    ],
-    layout(true),
-    { responsive: true }
-  );
-</script>
+    const toughnessLabel = {
+      x: [1.6],
+      y: [18],
+      mode: 'markers',
+      marker: { size: 12, color: 'rgba(59,130,246,0.6)' },
+      text: [hoverToughness],
+      hovertemplate: '%{text}<extra></extra>'
+    };
+
+    const resilienceLabel = {
+      x: [eps_y / 2],
+      y: [sigma_y / 2],
+      mode: 'markers',
+      marker: { size: 12, color: 'rgba(245,158,11,0.8)' },
+      text: [hoverResilience],
+      hovertemplate: '%{text}<extra></extra>'
+    };
+
+    // Main curve
+    const curveTrace = {
+      x: curve.map(p => p.x),
+      y: curve.map(p => p.y),
+      mode: 'lines',
+      line: { width: 4 },
+      hoverinfo: 'skip'
+    };
+
+    // Quiz markers
+    const pointsTrace = {
+      x: [ptProp.x, ptYield.x, ptDrop.x, ptPlateau.x, ptUTS.x, ptFrac.x],
+      y: [ptProp.y, ptYield.y, ptDrop.y, ptPlateau.y, ptUTS.y, ptFrac.y],
+      mode: 'markers',
+      marker: { size: 10, color: 'red' },
+      text: [hoverProp, hoverYield, hoverDrop, hoverPlateau, hoverUTS, hoverFrac],
+      hovertemplate: '%{text}<extra></extra>'
+    };
+
+    const elasticSlopeLabel = {
+      x: [0.006],
+      y: [E * 0.006],
+      mode: 'markers',
+      marker: { size: 10, color: 'purple' },
+      text: [hoverElastic],
+      hovertemplate: '%{text}<extra></extra>'
+    };
+
+    const hardeningLabel = {
+      x: [1.2],
+      y: [36],
+      mode: 'markers',
+      marker: { size: 10, color: 'purple' },
+      text: [hoverHardening],
+      hovertemplate: '%{text}<extra></extra>'
+    };
+
+    // Layout (x-axis displayed in %)
+    function layout(isZoom) {
+      return {
+        xaxis: { title: 'Engineering Strain, ε (%)', range: isZoom ? [0, 8] : [0, 320], tickformat: '.0f' },
+        yaxis: { title: 'Engineering Stress, σ (MPa)', range: isZoom ? [0, 60] : [0, 70] },
+        margin: { t: 30, l: 70, r: 20, b: 70 },
+        showlegend: false
+      };
+    }
+
+    function toPercentTrace(trace) {
+      const t = JSON.parse(JSON.stringify(trace));
+      if (t.x) t.x = t.x.map(v => v * 100);
+      return t;
+    }
+
+    Plotly.newPlot(
+      'curveMain',
+      [
+        toPercentTrace(resilienceTrace),
+        toPercentTrace(toughnessTrace),
+        toPercentTrace(curveTrace),
+        toPercentTrace(resilienceLabel),
+        toPercentTrace(toughnessLabel),
+        toPercentTrace(elasticSlopeLabel),
+        toPercentTrace(hardeningLabel),
+        toPercentTrace(pointsTrace)
+      ],
+      layout(false),
+      { responsive: true }
+    );
+
+    Plotly.newPlot(
+      'curveZoom',
+      [
+        toPercentTrace(resilienceTrace),
+        toPercentTrace(curveTrace),
+        toPercentTrace(resilienceLabel),
+        toPercentTrace(elasticSlopeLabel),
+        toPercentTrace(pointsTrace)
+      ],
+      layout(true),
+      { responsive: true }
+    );
+  </script>
+</body>
+</html>
