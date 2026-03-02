@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <title>Failure Scenarios Flowchart</title>
 
+<!-- MathJax -->
 <script>
 window.MathJax = {
   tex: { inlineMath: [['\\(','\\)'], ['$', '$']] },
@@ -13,282 +14,376 @@ window.MathJax = {
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 
 <style>
-body{
-  font-family: Arial, sans-serif;
-  margin:40px;
-  background:#f3f4f6;
-  color:#111827;
-}
-h1{text-align:center;margin-bottom:6px;}
-p.sub{text-align:center;color:#374151;margin-bottom:20px;}
+  body{
+    font-family: Arial, sans-serif;
+    margin:40px;
+    background:#f3f4f6;
+    color:#111827;
+  }
+  h1{text-align:center;margin-bottom:6px;}
+  p.sub{text-align:center;color:#374151;margin-bottom:20px;}
 
-.wrap{
-  max-width:1050px;
-  margin:auto;
-  background:white;
-  border-radius:14px;
-  padding:20px;
-  box-shadow:0 8px 20px rgba(0,0,0,0.08);
-}
+  .wrap{
+    max-width:1050px;
+    margin:auto;
+    background:white;
+    border-radius:14px;
+    padding:20px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.08);
+  }
 
-.flow{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:16px;
-}
+  .flow{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:16px;
+  }
 
-.node{
-  background:#2563eb;
-  color:white;
-  padding:14px 18px;
-  border-radius:12px;
-  font-weight:800;
-  font-size:1.3rem;
-}
+  .node{
+    background:#2563eb;
+    color:white;
+    padding:14px 18px;
+    border-radius:12px;
+    font-weight:800;
+    font-size:1.3rem;
+  }
 
-.stem{
-  width:4px;
-  height:24px;
-  background:#93c5fd;
-  border-radius:999px;
-}
+  .stem{
+    width:4px;
+    height:24px;
+    background:#93c5fd;
+    border-radius:999px;
+  }
 
-.bus{
-  height:4px;
-  width:90%;
-  background:#93c5fd;
-  border-radius:999px;
-  position:relative;
-}
-.bus .drop{
-  position:absolute;
-  width:4px;
-  height:18px;
-  background:#93c5fd;
-  border-radius:999px;
-  transform:translateX(-50%);
-}
-.bus .left{left:16.6%;}
-.bus .mid{left:50%;}
-.bus .right{left:83.3%;}
+  .bus{
+    height:4px;
+    width:90%;
+    background:#93c5fd;
+    border-radius:999px;
+    position:relative;
+  }
+  .bus .drop{
+    position:absolute;
+    width:4px;
+    height:18px;
+    background:#93c5fd;
+    border-radius:999px;
+    transform:translateX(-50%);
+  }
+  .bus .left{left:16.6%;}
+  .bus .mid{left:50%;}
+  .bus .right{left:83.3%;}
 
-.branchRow{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:18px;
-  width:100%;
-}
+  .branchRow{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:18px;
+    width:100%;
+  }
 
-.card{
-  background:#1d4ed8;
-  color:white;
-  border-radius:14px;
-  padding:16px;
-  box-shadow:0 6px 14px rgba(0,0,0,0.1);
-  cursor:pointer;
-  transition:0.15s ease;
-  position:relative;
-}
-.card:hover{
-  transform:translateY(-3px);
-  box-shadow:0 10px 20px rgba(0,0,0,0.14);
-}
+  .card{
+    background:#1d4ed8;
+    color:white;
+    border-radius:14px;
+    padding:16px;
+    box-shadow:0 6px 14px rgba(0,0,0,0.1);
+    cursor:pointer;
+    transition:0.15s ease;
+    position:relative;
+    overflow:hidden;
+  }
+  .card:hover{
+    transform:translateY(-3px);
+    box-shadow:0 10px 20px rgba(0,0,0,0.14);
+  }
 
-.title{
-  font-weight:800;
-  margin-bottom:10px;
-}
+  .title{
+    font-weight:800;
+    margin-bottom:10px;
+  }
 
-.eq{
-  background:rgba(255,255,255,0.12);
-  border-radius:10px;
-  padding:10px;
-  margin-bottom:10px;
-  line-height:1.4;
-}
+  .eq{
+    background:rgba(255,255,255,0.12);
+    border-radius:10px;
+    padding:10px;
+    margin-bottom:10px;
+    line-height:1.35;
+  }
 
-.vars{
-  margin-top:8px;
-  font-size:0.9rem;
-}
-.vars ul{
-  margin:6px 0 0 18px;
-}
+  .vars{
+    margin-top:8px;
+    font-size:0.90rem;
+    opacity:0.95;
+  }
+  .vars .lbl{
+    font-weight:800;
+    margin-bottom:4px;
+    display:block;
+  }
+  .vars ul{
+    margin:6px 0 0 18px;
+    padding:0;
+  }
 
-.imgBox{
-  background:rgba(255,255,255,0.12);
-  border-radius:10px;
-  padding:8px;
-  margin-bottom:10px;
-}
-.imgBox svg{
-  width:100%;
-  height:100px;
-}
+  .imgBox{
+    background:rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius:10px;
+    padding:8px;
+    margin-bottom:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .imgBox svg{
+    width:100%;
+    height:92px;
+  }
 
-.examples{
-  display:none;
-  background:rgba(255,255,255,0.15);
-  border-radius:10px;
-  padding:10px;
-  font-size:0.92rem;
-  margin-top:8px;
-}
-.card.open .examples{display:block;}
+  .examples{
+    display:none;
+    background:rgba(255,255,255,0.15);
+    border-radius:10px;
+    padding:10px;
+    font-size:0.92rem;
+    margin-top:8px;
+    line-height:1.35;
+  }
+  .card.open .examples{display:block;}
 
-.tip{
-  position:absolute;
-  bottom:12px;
-  left:12px;
-  right:12px;
-  background:white;
-  color:#111827;
-  padding:10px;
-  border-radius:10px;
-  opacity:0;
-  transform:translateY(6px);
-  transition:0.15s ease;
-  font-size:0.9rem;
-  pointer-events:none;
-}
-.card:hover .tip{opacity:1;transform:translateY(0);}
+  .tip{
+    position:absolute;
+    bottom:12px;
+    left:12px;
+    right:12px;
+    background:white;
+    color:#111827;
+    padding:10px;
+    border-radius:10px;
+    opacity:0;
+    transform:translateY(6px);
+    transition:0.15s ease;
+    font-size:0.9rem;
+    pointer-events:none;
+  }
+  .card:hover .tip{opacity:1;transform:translateY(0);}
 
-@media(max-width:900px){
-  .branchRow{grid-template-columns:1fr;}
-  .bus,.stem{display:none;}
-}
+  @media(max-width:900px){
+    .branchRow{grid-template-columns:1fr;}
+    .bus,.stem{display:none;}
+  }
+
+  a.back{
+    display:block;
+    text-align:center;
+    margin-top:18px;
+    color:#4f46e5;
+    text-decoration:none;
+  }
+  a.back:hover{ text-decoration:underline; }
 </style>
 </head>
 
 <body>
 
 <h1>Failure Scenarios Flowchart</h1>
-<p class="sub">Stress shown perpendicular to crack (Mode I opening).</p>
+<p class="sub">Hover for quick meaning. Click a card to toggle examples + variable definitions.</p>
 
 <div class="wrap">
-<div class="flow">
+  <div class="flow">
+    <div class="node">Failure</div>
+    <div class="stem"></div>
 
-<div class="node">Failure</div>
-<div class="stem"></div>
+    <div class="bus">
+      <div class="drop left"></div>
+      <div class="drop mid"></div>
+      <div class="drop right"></div>
+    </div>
 
-<div class="bus">
-<div class="drop left"></div>
-<div class="drop mid"></div>
-<div class="drop right"></div>
+    <div class="branchRow">
+
+      <!-- STATIC + FLAW -->
+      <div class="card">
+        <div class="title">Static loading + flaw</div>
+
+        <div class="imgBox" aria-label="Static loading with edge crack illustration">
+          <svg viewBox="0 0 320 120" role="img">
+            <!-- specimen -->
+            <rect x="90" y="18" width="170" height="84" rx="10" fill="rgba(255,255,255,0.92)"/>
+            <!-- EDGE crack on LEFT edge (no arrowhead) -->
+            <path d="M90 62
+                     C100 58, 102 66, 112 62
+                     C122 58, 124 66, 134 62
+                     C144 58, 146 66, 156 62"
+                  stroke="#111827" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+            <!-- STATIC load arrows next to cracked edge -->
+            <path d="M65 30 L65 90" stroke="#16a34a" stroke-width="8" stroke-linecap="round"/>
+            <polygon points="65,22 54,38 76,38" fill="#16a34a"/>
+            <polygon points="65,98 54,82 76,82" fill="#16a34a"/>
+
+            <text x="132" y="16" fill="#16a34a" font-size="14" font-weight="700">STATIC</text>
+          </svg>
+        </div>
+
+        <div class="eq">
+          <div>\( K = f\,\sigma\,\sqrt{\pi a} \)</div>
+          <div style="margin-top:6px;">Failure if \(K \ge K_{IC}\)</div>
+
+          <div class="vars">
+            <span class="lbl">Variables</span>
+            <ul>
+              <li>\(K\): stress intensity factor (Mode I here)</li>
+              <li>\(\sigma\): applied (nominal) stress</li>
+              <li>\(a\): crack size parameter</li>
+              <li>\(f\): geometry factor (also written \(Y\))</li>
+              <li>\(K_{IC}\): plane-strain fracture toughness</li>
+            </ul>
+            <div style="margin-top:8px;">
+              <b>\(a\) vs \(2a\):</b> Center crack is often labeled total length \(2a\) (so \(a\) is half-length).
+              Edge cracks are usually just labeled \(a\) from the edge inward. Keep your \(a\) definition consistent with \(f\).
+            </div>
+          </div>
+        </div>
+
+        <div class="examples">
+          <b>Examples</b><br>
+          • Pressure vessel with known weld defect under a one-time proof load<br>
+          • Brittle plate with an edge notch pulled in tension once<br>
+          • Glass/ceramic part with a surface crack under steady load<br>
+          • Structural bracket with a sharp crack loaded once near max service load
+        </div>
+
+        <div class="tip"><b>When to use</b><br>One-time/slow loading where a flaw controls immediate failure.</div>
+      </div>
+
+      <!-- FATIGUE (NO FLAW) -->
+      <div class="card">
+        <div class="title">Fatigue (no flaw)</div>
+
+        <div class="imgBox" aria-label="Fatigue test specimen illustration">
+          <svg viewBox="0 0 320 120" role="img">
+            <!-- grips -->
+            <rect x="18" y="44" width="58" height="32" rx="6" fill="rgba(255,255,255,0.92)"/>
+            <rect x="244" y="44" width="58" height="32" rx="6" fill="rgba(255,255,255,0.92)"/>
+            <!-- dogbone -->
+            <path d="M76 60
+                     C100 42, 120 42, 140 52
+                     L180 52
+                     C200 42, 220 42, 244 60
+                     C220 78, 200 78, 180 68
+                     L140 68
+                     C120 78, 100 78, 76 60 Z"
+                  fill="rgba(255,255,255,0.92)"/>
+
+            <!-- cyclic arrows -->
+            <path d="M160 20 L160 44" stroke="#60a5fa" stroke-width="8" stroke-linecap="round"/>
+            <polygon points="160,14 149,30 171,30" fill="#60a5fa"/>
+            <path d="M160 76 L160 100" stroke="#60a5fa" stroke-width="8" stroke-linecap="round"/>
+            <polygon points="160,106 149,90 171,90" fill="#60a5fa"/>
+
+            <text x="120" y="16" fill="#60a5fa" font-size="14" font-weight="700">CYCLIC</text>
+          </svg>
+        </div>
+
+        <div class="eq">
+          <div><b>S–N / endurance approach</b></div>
+          <div style="margin-top:6px;">Use stress amplitude \(\sigma_a\) vs cycles to failure \(N\)</div>
+
+          <div class="vars">
+            <span class="lbl">Common variables</span>
+            <ul>
+              <li>\(\sigma_{max}, \sigma_{min}\): max/min stress in a cycle</li>
+              <li>\(\sigma_a = (\sigma_{max}-\sigma_{min})/2\): stress amplitude</li>
+              <li>\(\sigma_m = (\sigma_{max}+\sigma_{min})/2\): mean stress</li>
+              <li>\(R = \sigma_{min}/\sigma_{max}\): stress ratio</li>
+              <li>\(N\): cycles to failure</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="examples">
+          <b>Examples</b><br>
+          • Rotating shaft in bending<br>
+          • Springs under repeated loading<br>
+          • Bolts experiencing vibration cycles<br>
+          • Gear tooth root bending under repeated meshing cycles
+        </div>
+
+        <div class="tip"><b>When to use</b><br>Cyclic loading when you assume no dominant pre-existing crack.</div>
+      </div>
+
+      <!-- FATIGUE + FLAW -->
+      <div class="card">
+        <div class="title">Fatigue + flaw</div>
+
+        <div class="imgBox" aria-label="Crack growth with cyclic loading illustration">
+          <svg viewBox="0 0 320 120" role="img">
+            <!-- specimen -->
+            <rect x="70" y="18" width="170" height="84" rx="10" fill="rgba(255,255,255,0.92)"/>
+            <!-- EDGE crack on RIGHT edge (no arrowhead) -->
+            <path d="M240 62
+                     C230 58, 228 66, 218 62
+                     C208 58, 206 66, 196 62
+                     C186 58, 184 66, 174 62"
+                  stroke="#111827" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+            <!-- cyclic load arrows right next to cracked edge -->
+            <path d="M270 30 L270 90" stroke="#60a5fa" stroke-width="8" stroke-linecap="round"/>
+            <polygon points="270,22 259,38 281,38" fill="#60a5fa"/>
+            <polygon points="270,98 259,82 281,82" fill="#60a5fa"/>
+
+            <!-- NEW: explicit "CYCLIC" label near the load -->
+            <text x="238" y="16" fill="#60a5fa" font-size="14" font-weight="700">CYCLIC</text>
+          </svg>
+        </div>
+
+        <div class="eq">
+          <div>\( \dfrac{da}{dN} = C(\Delta K)^n \)</div>
+          <div style="margin-top:6px;">\( \Delta K = f(\sigma_{max}-\sigma_{min})\sqrt{\pi a} \)</div>
+
+          <div class="vars">
+            <span class="lbl">Variables</span>
+            <ul>
+              <li>\(a\): crack size parameter</li>
+              <li>\(N\): number of cycles</li>
+              <li>\(\frac{da}{dN}\): crack growth per cycle</li>
+              <li>\(\Delta K\): range of stress intensity in a cycle</li>
+              <li>\(C, n\): Paris-law material constants</li>
+              <li>\(f\): geometry factor</li>
+            </ul>
+            <div style="margin-top:8px;">
+              <b>\(a\) vs \(2a\):</b> For a center crack, many texts label total length \(2a\). For an edge crack, length is usually \(a\).
+            </div>
+          </div>
+        </div>
+
+        <div class="examples">
+          <b>Examples</b><br>
+          • Aircraft skin with an inspected crack (damage tolerance)<br>
+          • Pipeline with detected flaw under pressure cycles<br>
+          • Bridge weld toe crack under repeated traffic loading<br>
+          • Structural plate with edge crack under repeated tension cycles
+        </div>
+
+        <div class="tip"><b>When to use</b><br>Cyclic loading with a known crack/flaw that grows with cycles.</div>
+      </div>
+
+    </div>
+  </div>
 </div>
 
-<div class="branchRow">
-
-<!-- STATIC + FLAW -->
-<div class="card">
-<div class="title">Static loading + flaw</div>
-
-<div class="imgBox">
-<svg viewBox="0 0 320 120">
-
-<rect x="90" y="18" width="170" height="84" rx="10" fill="white"/>
-
-<!-- horizontal crack -->
-<path d="M120 62 C130 58,132 66,142 62 C152 58,154 66,164 62"
-stroke="#111827" stroke-width="3" fill="none"/>
-
-<!-- VERTICAL tension (perpendicular to crack) -->
-<path d="M175 10 L175 30" stroke="#16a34a" stroke-width="8"/>
-<polygon points="175,2 165,18 185,18" fill="#16a34a"/>
-
-<path d="M175 90 L175 110" stroke="#16a34a" stroke-width="8"/>
-<polygon points="175,118 165,102 185,102" fill="#16a34a"/>
-
-<text x="140" y="16" fill="#16a34a" font-size="14" font-weight="700">STATIC</text>
-</svg>
-</div>
-
-<div class="eq">
-\( K = f\sigma\sqrt{\pi a} \)<br>
-Failure if \(K \ge K_{IC}\)
-<div class="vars">
-<ul>
-<li>\(\sigma\): applied normal stress</li>
-<li>\(a\): crack length parameter</li>
-<li>\(K_{IC}\): fracture toughness</li>
-</ul>
-Center crack total length = \(2a\); edge crack = \(a\).
-</div>
-</div>
-
-<div class="examples">
-• Pressure vessel crack under proof test<br>
-• Ceramic plate under steady tension<br>
-• Glass with surface flaw<br>
-• Structural bracket with notch<br>
-• Brittle component under monotonic load
-</div>
-
-<div class="tip">Constant tensile stress opening the crack (Mode I).</div>
-</div>
-
-<!-- FATIGUE + FLAW -->
-<div class="card">
-<div class="title">Fatigue + flaw</div>
-
-<div class="imgBox">
-<svg viewBox="0 0 320 120">
-
-<rect x="70" y="18" width="170" height="84" rx="10" fill="white"/>
-
-<!-- horizontal crack -->
-<path d="M200 62 C210 58,212 66,222 62 C232 58,234 66,244 62"
-stroke="#111827" stroke-width="3" fill="none"/>
-
-<!-- CYCLIC vertical stress -->
-<path d="M155 10 L155 30" stroke="#60a5fa" stroke-width="8"/>
-<polygon points="155,2 145,18 165,18" fill="#60a5fa"/>
-
-<path d="M155 90 L155 110" stroke="#60a5fa" stroke-width="8"/>
-<polygon points="155,118 145,102 165,102" fill="#60a5fa"/>
-
-<!-- sine wave -->
-<path d="M120 16 C128 8,136 8,144 16 C152 24,160 24,168 16"
-stroke="#60a5fa" stroke-width="3" fill="none"/>
-
-<text x="120" y="16" fill="#60a5fa" font-size="14" font-weight="700">CYCLIC</text>
-</svg>
-</div>
-
-<div class="eq">
-\( \dfrac{da}{dN} = C(\Delta K)^n \)
-<div class="vars">
-<ul>
-<li>\(\Delta K\): stress intensity range</li>
-<li>\(C,n\): material constants</li>
-<li>\(a\): crack length</li>
-</ul>
-</div>
-</div>
-
-<div class="examples">
-• Aircraft fuselage crack growth<br>
-• Pipeline pressure cycling<br>
-• Bridge weld crack<br>
-• Turbine blade defect<br>
-• Structural plate under cyclic tension
-</div>
-
-<div class="tip">Alternating tensile stress opens crack each cycle.</div>
-</div>
-
-</div>
-</div>
-</div>
+<a class="back" href="index.html">← Back to Home</a>
 
 <script>
-document.querySelectorAll(".card").forEach(card=>{
-card.addEventListener("click",()=>{
-card.classList.toggle("open");
-if(window.MathJax) MathJax.typeset();
-});
-});
+  document.querySelectorAll(".card").forEach(card=>{
+    card.addEventListener("click",()=>{
+      card.classList.toggle("open");
+      if (window.MathJax && window.MathJax.typeset) {
+        window.MathJax.typeset();
+      }
+    });
+  });
 </script>
 
 </body>
