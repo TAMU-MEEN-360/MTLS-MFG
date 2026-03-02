@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <title>Failure Scenarios Flowchart</title>
 
-<!-- MathJax -->
 <script>
 window.MathJax = {
   tex: { inlineMath: [['\\(','\\)'], ['$', '$']] },
@@ -125,7 +124,7 @@ p.sub{text-align:center;color:#374151;margin-bottom:20px;}
 }
 .imgBox svg{
   width:100%;
-  height:95px;
+  height:100px;
 }
 
 .examples{
@@ -165,7 +164,7 @@ p.sub{text-align:center;color:#374151;margin-bottom:20px;}
 <body>
 
 <h1>Failure Scenarios Flowchart</h1>
-<p class="sub">Hover for meaning. Click a card for examples + variable definitions.</p>
+<p class="sub">Stress shown perpendicular to crack (Mode I opening).</p>
 
 <div class="wrap">
 <div class="flow">
@@ -187,103 +186,47 @@ p.sub{text-align:center;color:#374151;margin-bottom:20px;}
 
 <div class="imgBox">
 <svg viewBox="0 0 320 120">
+
 <rect x="90" y="18" width="170" height="84" rx="10" fill="white"/>
 
-<!-- edge crack LEFT -->
-<path d="M90 62 C100 58,102 66,112 62 C122 58,124 66,134 62"
+<!-- horizontal crack -->
+<path d="M120 62 C130 58,132 66,142 62 C152 58,154 66,164 62"
 stroke="#111827" stroke-width="3" fill="none"/>
 
-<!-- constant tension arrows -->
-<path d="M70 60 L52 60" stroke="#16a34a" stroke-width="8"/>
-<polygon points="44,60 56,52 56,68" fill="#16a34a"/>
-<path d="M270 60 L288 60" stroke="#16a34a" stroke-width="8"/>
-<polygon points="296,60 284,52 284,68" fill="#16a34a"/>
+<!-- VERTICAL tension (perpendicular to crack) -->
+<path d="M175 10 L175 30" stroke="#16a34a" stroke-width="8"/>
+<polygon points="175,2 165,18 185,18" fill="#16a34a"/>
 
-<text x="132" y="16" fill="#16a34a" font-size="14" font-weight="700">STATIC</text>
+<path d="M175 90 L175 110" stroke="#16a34a" stroke-width="8"/>
+<polygon points="175,118 165,102 185,102" fill="#16a34a"/>
+
+<text x="140" y="16" fill="#16a34a" font-size="14" font-weight="700">STATIC</text>
 </svg>
 </div>
 
 <div class="eq">
 \( K = f\sigma\sqrt{\pi a} \)<br>
 Failure if \(K \ge K_{IC}\)
-
 <div class="vars">
 <ul>
-<li>\(K\): stress intensity factor</li>
-<li>\(\sigma\): applied stress</li>
-<li>\(a\): crack size parameter</li>
-<li>\(f\): geometry factor</li>
+<li>\(\sigma\): applied normal stress</li>
+<li>\(a\): crack length parameter</li>
 <li>\(K_{IC}\): fracture toughness</li>
 </ul>
-<b>Note on crack length:</b><br>
-Center crack total length = \(2a\).<br>
-Edge crack length = \(a\).
+Center crack total length = \(2a\); edge crack = \(a\).
 </div>
 </div>
 
 <div class="examples">
-<b>Examples:</b><br>
-• Pressure vessel weld crack<br>
-• Brittle plate with notch<br>
-• Ceramic component under steady load<br>
-• Structural bracket with sharp flaw<br>
-• Glass panel with surface crack<br><br>
-<b>You calculate:</b> Critical crack size or allowable stress.
+• Pressure vessel crack under proof test<br>
+• Ceramic plate under steady tension<br>
+• Glass with surface flaw<br>
+• Structural bracket with notch<br>
+• Brittle component under monotonic load
 </div>
 
-<div class="tip">
-Single/slow load where a crack controls immediate fracture.
+<div class="tip">Constant tensile stress opening the crack (Mode I).</div>
 </div>
-</div>
-
-
-<!-- FATIGUE NO FLAW -->
-<div class="card">
-<div class="title">Fatigue (no flaw)</div>
-
-<div class="imgBox">
-<svg viewBox="0 0 320 120">
-<rect x="40" y="44" width="60" height="32" rx="6" fill="white"/>
-<rect x="220" y="44" width="60" height="32" rx="6" fill="white"/>
-<path d="M100 60 C130 45,170 45,200 60 C170 75,130 75,100 60 Z" fill="white"/>
-
-<path d="M160 20 L160 44" stroke="#60a5fa" stroke-width="8"/>
-<polygon points="160,14 149,30 171,30" fill="#60a5fa"/>
-<path d="M160 76 L160 100" stroke="#60a5fa" stroke-width="8"/>
-<polygon points="160,106 149,90 171,90" fill="#60a5fa"/>
-
-<text x="120" y="16" fill="#60a5fa" font-size="14" font-weight="700">CYCLIC</text>
-</svg>
-</div>
-
-<div class="eq">
-Use S–N curve / endurance limit
-
-<div class="vars">
-<ul>
-<li>\(\sigma_a\): stress amplitude</li>
-<li>\(\sigma_m\): mean stress</li>
-<li>\(R\): stress ratio</li>
-<li>\(N\): cycles to failure</li>
-</ul>
-</div>
-</div>
-
-<div class="examples">
-<b>Examples:</b><br>
-• Rotating shaft<br>
-• Spring under repeated loading<br>
-• Bolt under vibration<br>
-• Gear tooth root fatigue<br>
-• Bike frame under road cycles<br><br>
-<b>You calculate:</b> Fatigue life or allowable stress.
-</div>
-
-<div class="tip">
-Cyclic loading with no dominant initial crack.
-</div>
-</div>
-
 
 <!-- FATIGUE + FLAW -->
 <div class="card">
@@ -291,51 +234,48 @@ Cyclic loading with no dominant initial crack.
 
 <div class="imgBox">
 <svg viewBox="0 0 320 120">
+
 <rect x="70" y="18" width="170" height="84" rx="10" fill="white"/>
 
-<!-- edge crack RIGHT -->
-<path d="M240 62 C230 58,228 66,218 62 C208 58,206 66,196 62"
+<!-- horizontal crack -->
+<path d="M200 62 C210 58,212 66,222 62 C232 58,234 66,244 62"
 stroke="#111827" stroke-width="3" fill="none"/>
 
-<path d="M265 30 L265 90" stroke="#60a5fa" stroke-width="8"/>
-<polygon points="265,22 254,38 276,38" fill="#60a5fa"/>
-<polygon points="265,98 254,82 276,82" fill="#60a5fa"/>
+<!-- CYCLIC vertical stress -->
+<path d="M155 10 L155 30" stroke="#60a5fa" stroke-width="8"/>
+<polygon points="155,2 145,18 165,18" fill="#60a5fa"/>
 
-<path d="M245 18 C252 10,258 10,265 18 C272 26,278 26,285 18"
+<path d="M155 90 L155 110" stroke="#60a5fa" stroke-width="8"/>
+<polygon points="155,118 145,102 165,102" fill="#60a5fa"/>
+
+<!-- sine wave -->
+<path d="M120 16 C128 8,136 8,144 16 C152 24,160 24,168 16"
 stroke="#60a5fa" stroke-width="3" fill="none"/>
 
-<text x="118" y="16" fill="#60a5fa" font-size="14" font-weight="700">CYCLIC</text>
+<text x="120" y="16" fill="#60a5fa" font-size="14" font-weight="700">CYCLIC</text>
 </svg>
 </div>
 
 <div class="eq">
-\( \dfrac{da}{dN} = C(\Delta K)^n \)<br>
-\( \Delta K = f(\sigma_{max}-\sigma_{min})\sqrt{\pi a} \)
-
+\( \dfrac{da}{dN} = C(\Delta K)^n \)
 <div class="vars">
 <ul>
-<li>\(a\): crack size</li>
 <li>\(\Delta K\): stress intensity range</li>
 <li>\(C,n\): material constants</li>
-<li>\(\sigma_{max}, \sigma_{min}\): cycle limits</li>
+<li>\(a\): crack length</li>
 </ul>
-Center crack uses total \(2a\); edge crack uses \(a\).
 </div>
 </div>
 
 <div class="examples">
-<b>Examples:</b><br>
 • Aircraft fuselage crack growth<br>
-• Pipeline under pressure cycles<br>
-• Bridge weld crack under traffic<br>
+• Pipeline pressure cycling<br>
+• Bridge weld crack<br>
 • Turbine blade defect<br>
-• Structural plate edge crack under cyclic tension<br><br>
-<b>You calculate:</b> Crack growth life to critical size.
+• Structural plate under cyclic tension
 </div>
 
-<div class="tip">
-Cyclic loading where a crack already exists and grows.
-</div>
+<div class="tip">Alternating tensile stress opens crack each cycle.</div>
 </div>
 
 </div>
@@ -344,10 +284,10 @@ Cyclic loading where a crack already exists and grows.
 
 <script>
 document.querySelectorAll(".card").forEach(card=>{
-  card.addEventListener("click",()=>{
-    card.classList.toggle("open");
-    if (window.MathJax) MathJax.typeset();
-  });
+card.addEventListener("click",()=>{
+card.classList.toggle("open");
+if(window.MathJax) MathJax.typeset();
+});
 });
 </script>
 
