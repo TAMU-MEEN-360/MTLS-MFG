@@ -22,7 +22,8 @@
       padding: 18px;
       box-shadow: 0 8px 20px rgba(0,0,0,0.08);
     }
-    #curveMain, #curveZoom { width: 100%; height: 560px; }
+
+    #curveMain { width: 100%; height: 560px; }
 
     a {
       display: block;
@@ -44,63 +45,53 @@
 
 <body>
   <h1>Engineering Stress–Strain (Thermoplastic)</h1>
-  <p>Quiz yourself: hover over labeled points/regions to reveal what they represent.</p>
+  <p>Quiz yourself: hover over labeled points to reveal what they represent.</p>
 
   <div class="plot-wrap">
     <div id="curveMain"></div>
     <div class="hint">Tip: Hover over each label marker to learn what that region of the polymer curve means.</div>
   </div>
 
-  <div class="plot-wrap">
-    <div id="curveZoom"></div>
-    <div class="hint">Zoomed view focuses on the early curve, yield peak, and necking.</div>
-  </div>
-
   <a href="index.html">← Back to Home</a>
 
   <script>
     // ------------------------------------------------------------
-    // Screenshot-style thermoplastic curve:
-    // Linear elastic → Nonlinear elastic → Yield peak → Necking drop
-    // → Plastic plateau (cold drawing) → Strain hardening → UTS → Failure
+    // Screenshot-style thermoplastic curve
+    // Linear elastic → Nonlinear elastic → Yield → Necking
+    // → Plastic plateau → Strain hardening → Tensile strength → Failure
     // ------------------------------------------------------------
 
-    // Teaching values (generic thermoplastic; shape tuned to match screenshot)
-    const eps_y = 0.50;          // 50% strain yield peak (your request)
-    const sigma_y = 40;          // MPa yield peak
-    const sigma_plateau = 26;    // MPa plateau (cold drawing)
-    const eps_uts = 2.80;        // 280% strain at UTS
-    const sigma_uts = 58;        // MPa UTS
-    const eps_fail = 3.00;       // 300% strain at failure
-    const sigma_fail = 52;       // MPa stress at failure
+    const eps_y = 0.50;        // 50% strain (yield peak)
+    const sigma_y = 40;        // MPa yield
+    const sigma_plateau = 26;  // MPa plateau
+    const eps_uts = 2.80;      // 280% strain
+    const sigma_uts = 58;      // MPa UTS
+    const eps_fail = 3.00;     // 300% strain
+    const sigma_fail = 52;     // MPa at failure
 
-    // ------------------------------------------------------------
-    // Curve points (NO early spike/drop; monotonic rise to yield)
-    // x is strain (in/in). We convert to % for plotting.
-    // ------------------------------------------------------------
     const curve = [
       { x: 0.00, y: 0 },
 
-      // Linear elastic (small strain) — straight-ish
+      // Linear elastic
       { x: 0.05, y: 10 },
       { x: 0.10, y: 18 },
 
-      // Nonlinear elastic — curve flattens slightly as it approaches yield
+      // Nonlinear elastic
       { x: 0.20, y: 28 },
       { x: 0.35, y: 36 },
       { x: 0.45, y: 39 },
 
-      // Yield peak (~50%)
+      // Yield peak
       { x: eps_y, y: sigma_y },
 
-      // Necking drop right after yield
+      // Necking drop
       { x: 0.62, y: 27 },
 
-      // Plastic deformation (cold drawing plateau)
+      // Plastic plateau (cold drawing)
       { x: 0.80, y: sigma_plateau },
       { x: 2.00, y: sigma_plateau },
 
-      // Strain hardening up to UTS
+      // Strain hardening
       { x: 2.30, y: 33 },
       { x: 2.55, y: 42 },
       { x: eps_uts, y: sigma_uts },
@@ -109,66 +100,50 @@
       { x: eps_fail, y: sigma_fail }
     ];
 
-    // ------------------------------------------------------------
-    // Label marker locations (placed like the screenshot)
-    // ------------------------------------------------------------
-    const ptLinearElastic = { x: 0.08, y: 14 };           // in the initial linear-ish region
-    const ptNonlinearElastic = { x: 0.30, y: 33 };        // curved region before yield
-    const ptYield = { x: eps_y, y: sigma_y };             // yield peak
-    const ptNecking = { x: 0.62, y: 27 };                 // immediately after yield
-    const ptPlastic = { x: 1.50, y: sigma_plateau };      // plateau region
-    const ptUTS = { x: eps_uts, y: sigma_uts };           // UTS
-    const ptFailure = { x: eps_fail, y: sigma_fail };     // failure
+    const ptLinearElastic = { x: 0.08, y: 14 };
+    const ptNonlinearElastic = { x: 0.30, y: 33 };
+    const ptYield = { x: eps_y, y: sigma_y };
+    const ptNecking = { x: 0.62, y: 27 };
+    const ptPlastic = { x: 1.50, y: sigma_plateau };
+    const ptUTS = { x: eps_uts, y: sigma_uts };
+    const ptFailure = { x: eps_fail, y: sigma_fail };
 
-    // ------------------------------------------------------------
-    // Popup text (same style as your current popups)
-    // ------------------------------------------------------------
     const hoverLinearElastic =
-      `<b>Linear Elastic Deformation</b><br>` +
-      `Initial region where stress increases approximately linearly with strain.<br>` +
-      `Often modeled by Hooke’s law at small strain:<br>` +
-      `<b>σ = E·ε</b><br>` +
-      `Slope here is the tensile modulus (E).`;
+      `<b>Linear Elastic Deformation</b><br>
+       Initial region where stress increases approximately linearly with strain.<br>
+       <b>σ = E·ε</b><br>
+       Slope here represents the tensile modulus.`;
 
     const hoverNonlinearElastic =
-      `<b>Nonlinear Elastic Deformation</b><br>` +
-      `Stress–strain response becomes curved before yield.<br>` +
-      `Much of this deformation can still be recoverable (viscoelastic effects).<br>` +
-      `Polymers often show nonlinearity early due to chain uncoiling/rearrangement.`;
+      `<b>Nonlinear Elastic Deformation</b><br>
+       Curve becomes nonlinear before yield.<br>
+       Much deformation may still be recoverable (viscoelastic effects).`;
 
     const hoverYield =
-      `<b>Yield Strength</b><br>` +
-      `First local maximum in <i>engineering</i> stress (the “yield peak”).<br>` +
-      `Marks the start of significant permanent (plastic) deformation.<br>` +
-      `After this point, engineering stress often drops as necking begins.`;
+      `<b>Yield Strength</b><br>
+       First local maximum in engineering stress.<br>
+       Marks onset of significant plastic deformation.`;
 
     const hoverNecking =
-      `<b>Necking</b><br>` +
-      `Deformation localizes into a reduced-area region (a <b>neck</b>).<br>` +
-      `Engineering stress drops because the load is carried by a smaller cross-section.<br>` +
-      `Necking commonly transitions into a long drawing plateau in ductile thermoplastics.`;
+      `<b>Necking</b><br>
+       Deformation localizes into a reduced-area region (neck).<br>
+       Engineering stress drops due to reduced cross-section.`;
 
     const hoverPlastic =
-      `<b>Plastic Deformation</b><br>` +
-      `Large, permanent deformation occurs.<br>` +
-      `In many thermoplastics, this includes <b>cold drawing</b>:<br>` +
-      `the neck propagates while stress remains ~constant (plateau).`;
+      `<b>Plastic Deformation</b><br>
+       Large permanent deformation.<br>
+       Often includes cold drawing where stress remains ~constant.`;
 
     const hoverUTS =
-      `<b>Tensile Strength (UTS)</b><br>` +
-      `Maximum <i>engineering</i> stress on the curve.<br>` +
-      `Also called the <b>ultimate tensile strength</b> (UTS).<br>` +
-      `The rise toward UTS is often due to <b>strain hardening</b> (chain alignment).`;
+      `<b>Tensile Strength (UTS)</b><br>
+       Maximum engineering stress on the curve.<br>
+       Rise toward UTS is due to strain hardening (chain alignment).`;
 
     const hoverFailure =
-      `<b>Failure</b><br>` +
-      `Final separation of the specimen after large plastic deformation.<br>` +
-      `Often reported as tensile strength at break and strain at break.<br>` +
-      `Failure may occur by ductile tearing, neck rupture, or brittle fracture depending on conditions.`;
+      `<b>Failure</b><br>
+       Final separation after large plastic deformation.<br>
+       Reported as tensile strength at break and strain at break.`;
 
-    // ------------------------------------------------------------
-    // Traces
-    // ------------------------------------------------------------
     const curveTrace = {
       x: curve.map(p => p.x),
       y: curve.map(p => p.y),
@@ -178,36 +153,54 @@
     };
 
     const labelsTrace = {
-      x: [ptLinearElastic.x, ptNonlinearElastic.x, ptYield.x, ptNecking.x, ptPlastic.x, ptUTS.x, ptFailure.x],
-      y: [ptLinearElastic.y, ptNonlinearElastic.y, ptYield.y, ptNecking.y, ptPlastic.y, ptUTS.y, ptFailure.y],
+      x: [
+        ptLinearElastic.x,
+        ptNonlinearElastic.x,
+        ptYield.x,
+        ptNecking.x,
+        ptPlastic.x,
+        ptUTS.x,
+        ptFailure.x
+      ],
+      y: [
+        ptLinearElastic.y,
+        ptNonlinearElastic.y,
+        ptYield.y,
+        ptNecking.y,
+        ptPlastic.y,
+        ptUTS.y,
+        ptFailure.y
+      ],
       mode: 'markers',
       marker: { size: 10, color: 'red' },
-      text: [hoverLinearElastic, hoverNonlinearElastic, hoverYield, hoverNecking, hoverPlastic, hoverUTS, hoverFailure],
+      text: [
+        hoverLinearElastic,
+        hoverNonlinearElastic,
+        hoverYield,
+        hoverNecking,
+        hoverPlastic,
+        hoverUTS,
+        hoverFailure
+      ],
       hovertemplate: '%{text}<extra></extra>'
     };
 
-    // ------------------------------------------------------------
-    // Layout
-    // Full: 0–320% strain like screenshot
-    // Zoom: 0–80% includes yield+necking
-    // ------------------------------------------------------------
-    function layout(isZoom) {
+    function layout() {
       return {
         xaxis: {
           title: 'Engineering Strain, ε (%)',
-          range: isZoom ? [0, 80] : [0, 320],
+          range: [0, 320],
           tickformat: '.0f'
         },
         yaxis: {
           title: 'Engineering Stress, σ (MPa)',
-          range: isZoom ? [0, 60] : [0, 70]
+          range: [0, 70]
         },
         margin: { t: 30, l: 70, r: 20, b: 70 },
         showlegend: false
       };
     }
 
-    // Convert x from (in/in) to (%) for plotting
     function toPercentTrace(trace) {
       const t = JSON.parse(JSON.stringify(trace));
       if (t.x) t.x = t.x.map(v => v * 100);
@@ -217,14 +210,7 @@
     Plotly.newPlot(
       'curveMain',
       [toPercentTrace(curveTrace), toPercentTrace(labelsTrace)],
-      layout(false),
-      { responsive: true }
-    );
-
-    Plotly.newPlot(
-      'curveZoom',
-      [toPercentTrace(curveTrace), toPercentTrace(labelsTrace)],
-      layout(true),
+      layout(),
       { responsive: true }
     );
   </script>
