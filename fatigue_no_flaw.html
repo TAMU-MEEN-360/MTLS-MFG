@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Fatigue Example – Rotating Shaft Design</title>
+
+<!-- MathJax -->
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(','\\)'], ['$', '$']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+
+body{
+  font-family: Arial, sans-serif;
+  margin:40px;
+  background:#f3f4f6;
+  color:#111827;
+}
+
+h1{
+  text-align:center;
+  margin-bottom:8px;
+}
+
+.sub{
+  text-align:center;
+  color:#374151;
+  margin-bottom:28px;
+}
+
+.wrap{
+  max-width:900px;
+  margin:auto;
+  background:white;
+  border-radius:14px;
+  padding:28px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.08);
+}
+
+.sectionTitle{
+  font-weight:800;
+  font-size:1.25rem;
+  margin-top:22px;
+  margin-bottom:10px;
+}
+
+.eq{
+  background:#eef2ff;
+  border-radius:10px;
+  padding:14px;
+  margin:14px 0;
+  font-size:1.05rem;
+}
+
+.step{
+  margin:12px 0;
+  line-height:1.5;
+}
+
+.result{
+  background:#dbeafe;
+  border-radius:10px;
+  padding:16px;
+  margin-top:20px;
+  font-weight:700;
+}
+
+.note{
+  margin-top:18px;
+  padding:14px;
+  background:#f9fafb;
+  border-left:4px solid #2563eb;
+  border-radius:8px;
+  line-height:1.5;
+}
+
+.back{
+  display:block;
+  text-align:center;
+  margin-top:30px;
+  text-decoration:none;
+  color:#4f46e5;
+  font-weight:600;
+}
+
+.back:hover{
+  text-decoration:underline;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>Fatigue (No Flaw) Example</h1>
+<p class="sub">Example 7-10 — Design of a Rotating Shaft</p>
+
+<div class="wrap">
+
+<div class="sectionTitle">Problem</div>
+
+<div class="step">
+A solid shaft for a cement kiln produced from the tool steel in Figure 7-18 must be
+96 in. long and must survive continuous operation for one year with an applied load
+of 12,500 lb. The shaft rotates at one revolution per minute during operation.
+</div>
+
+<div class="step">
+Design a shaft that will satisfy these requirements.
+</div>
+
+
+<div class="sectionTitle">Step 1 — Determine Required Fatigue Life</div>
+
+<div class="step">
+The number of loading cycles in one year equals the number of shaft revolutions.
+</div>
+
+<div class="eq">
+\( N = (1 \; \text{cycle/min})(60 \; \text{min/hr})(24 \; \text{hr/day})(365 \; \text{days/yr}) \)
+</div>
+
+<div class="eq">
+\( N = 5.256 \times 10^{5} \; \text{cycles} \)
+</div>
+
+<div class="step">
+From the S–N curve for this tool steel (Figure 7-18), the allowable stress for this
+fatigue life is approximately:
+</div>
+
+<div class="eq">
+\( \sigma_{allow} \approx 72{,}000 \; \text{psi} \)
+</div>
+
+
+<div class="sectionTitle">Step 2 — Determine Shaft Diameter</div>
+
+<div class="step">
+Using the bending stress relation for a circular shaft:
+</div>
+
+<div class="eq">
+\( \sigma = \dfrac{32FL}{d^{3}} \)
+</div>
+
+<div class="step">
+Substitute the given values:
+</div>
+
+<div class="eq">
+\( 72{,}000 = \dfrac{32(12{,}500)(96)}{d^{3}} \)
+</div>
+
+<div class="step">
+Solving for the diameter:
+</div>
+
+<div class="eq">
+\( d = 5.54 \; \text{in.} \)
+</div>
+
+<div class="step">
+A shaft with a diameter of about <b>5.54 in</b> would survive one year of operation.
+</div>
+
+
+<div class="sectionTitle">Step 3 — Apply a Factor of Safety</div>
+
+<div class="step">
+Assume a factor of safety of 2.  
+The allowable stress becomes:
+</div>
+
+<div class="eq">
+\( \sigma_{design} = \frac{72{,}000}{2} = 36{,}000 \; \text{psi} \)
+</div>
+
+<div class="step">
+Substitute this value into the stress equation:
+</div>
+
+<div class="eq">
+\( 36{,}000 = \dfrac{32(12{,}500)(96)}{d^{3}} \)
+</div>
+
+<div class="step">
+Solving for the new required diameter:
+</div>
+
+<div class="eq">
+\( d = 6.98 \; \text{in.} \)
+</div>
+
+
+<div class="result">
+Recommended shaft diameter:  
+\( d \approx 7.0 \; \text{in.} \)
+</div>
+
+
+<div class="sectionTitle">Engineering Notes</div>
+
+<div class="note">
+Selecting a larger shaft reduces the stress level and delays fatigue failure.
+In real cement kiln operation, additional factors may accelerate fatigue,
+including high temperatures and corrosive environments.  
+Regular inspection of components is therefore essential to prevent catastrophic failure.
+</div>
+
+</div>
+
+<a class="back" href="index.html">← Back to Flowchart</a>
+
+</body>
+</html>
