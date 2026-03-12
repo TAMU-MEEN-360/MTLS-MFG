@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Static Crack Example – Nondestructive Test Design</title>
+
+<!-- MathJax -->
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(','\\)'], ['$', '$']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+
+body{
+  font-family: Arial, sans-serif;
+  margin:40px;
+  background:#f3f4f6;
+  color:#111827;
+}
+
+h1{
+  text-align:center;
+  margin-bottom:8px;
+}
+
+.sub{
+  text-align:center;
+  color:#374151;
+  margin-bottom:28px;
+}
+
+.wrap{
+  max-width:900px;
+  margin:auto;
+  background:white;
+  border-radius:14px;
+  padding:28px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.08);
+}
+
+.sectionTitle{
+  font-weight:800;
+  font-size:1.25rem;
+  margin-top:22px;
+  margin-bottom:10px;
+}
+
+.step{
+  margin:12px 0;
+  line-height:1.5;
+}
+
+.eq{
+  background:#eef2ff;
+  border-radius:10px;
+  padding:14px;
+  margin:14px 0;
+  font-size:1.05rem;
+}
+
+.result{
+  background:#dbeafe;
+  border-radius:10px;
+  padding:16px;
+  margin-top:20px;
+  font-weight:700;
+}
+
+.note{
+  margin-top:18px;
+  padding:14px;
+  background:#f9fafb;
+  border-left:4px solid #2563eb;
+  border-radius:8px;
+  line-height:1.5;
+}
+
+.figure{
+  text-align:center;
+  margin:20px 0;
+}
+
+.figure img{
+  max-width:100%;
+  border-radius:10px;
+}
+
+.caption{
+  font-size:0.9rem;
+  color:#374151;
+  margin-top:6px;
+}
+
+.back{
+  display:block;
+  text-align:center;
+  margin-top:30px;
+  text-decoration:none;
+  color:#4f46e5;
+  font-weight:600;
+}
+
+.back:hover{
+  text-decoration:underline;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>Static Loading + Flaw Example</h1>
+<p class="sub">Example 7-1 — Design of a Nondestructive Test</p>
+
+<div class="wrap">
+
+<div class="sectionTitle">Problem</div>
+
+<div class="step">
+A large steel plate used in a nuclear reactor has a plane strain fracture toughness of
+\(K_{IC} = 80{,}000\;psi\sqrt{in}\) and experiences a service stress of
+\(45{,}000\;psi\).
+</div>
+
+<div class="step">
+Design a testing or inspection procedure capable of detecting a crack at the
+edge of the plate before the crack is likely to grow at a catastrophic rate.
+</div>
+
+<div class="sectionTitle">Step 1 — Fracture Condition</div>
+
+<div class="step">
+Failure occurs when the stress intensity factor equals the fracture toughness.
+For an edge crack:
+</div>
+
+<div class="eq">
+\(K_I = f\sigma\sqrt{\pi a}\)
+</div>
+
+<div class="step">
+For a single-edge crack, the geometry factor is approximately:
+</div>
+
+<div class="eq">
+\(f = 1.12\)
+</div>
+
+<div class="sectionTitle">Step 2 — Solve for the Critical Crack Size</div>
+
+<div class="step">
+Substitute the known values into the fracture toughness equation.
+</div>
+
+<div class="eq">
+\(80{,}000 = (1.12)(45{,}000)\sqrt{\pi a}\)
+</div>
+
+<div class="step">
+Solving for the crack length \(a\):
+</div>
+
+<div class="eq">
+\(a = 0.8\;in.\)
+</div>
+
+<div class="sectionTitle">Design Requirement</div>
+
+<div class="result">
+Critical crack size:
+
+\(a_c = 0.8\;in.\)
+
+Inspection methods must detect cracks **smaller than 0.8 in.**
+before catastrophic fracture can occur.
+</div>
+
+<div class="sectionTitle">Engineering Interpretation</div>
+
+<div class="note">
+A crack of this size should be relatively easy to detect. In many cases,
+cracks approaching 0.8 inches can be observed visually.  
+Several nondestructive testing methods are capable of detecting
+much smaller cracks, including:
+</div>
+
+<ul>
+<li>Dye penetrant inspection</li>
+<li>Magnetic particle inspection</li>
+<li>Eddy current inspection</li>
+</ul>
+
+<div class="note">
+If inspections are performed regularly and crack growth is slow,
+a flaw should be discovered long before reaching the critical
+crack size that would cause catastrophic failure.
+</div>
+
+<div class="sectionTitle">Optional Figure</div>
+
+<div class="figure">
+
+<!-- if you add a picture -->
+<img src="figure7-1.png">
+
+<div class="caption">
+Example crack geometry for an edge crack in a plate.
+</div>
+
+</div>
+
+</div>
+
+<a class="back" href="index.html">← Back to Flowchart</a>
+
+</body>
+</html>
