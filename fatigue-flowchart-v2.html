@@ -204,7 +204,51 @@ window.MathJax = {
 
       <!-- STATIC + FLAW -->
       <div class="card" onclick="location.href='static_flaw.html'">
+      <div class="card">
+        <div class="title">Static loading + flaw</div>
 
+        <div class="imgBox" aria-label="Static loading with edge crack illustration">
+          <svg viewBox="0 0 320 120" role="img">
+            <!-- specimen -->
+            <rect x="90" y="18" width="170" height="84" rx="10" fill="rgba(255,255,255,0.92)"/>
+            <!-- EDGE crack on LEFT edge (no arrowhead) -->
+            <path d="M90 62
+                     C100 58, 102 66, 112 62
+                     C122 58, 124 66, 134 62
+                     C144 58, 146 66, 156 62"
+                  stroke="#111827" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+            <!-- STATIC load arrows next to cracked edge -->
+            <path d="M65 30 L65 90" stroke="#16a34a" stroke-width="8" stroke-linecap="round"/>
+            <polygon points="65,22 54,38 76,38" fill="#16a34a"/>
+            <polygon points="65,98 54,82 76,82" fill="#16a34a"/>
+
+            <text x="132" y="16" fill="#16a34a" font-size="14" font-weight="700">STATIC</text>
+          </svg>
+        </div>
+
+        <div class="eq">
+          <div>\( K = f\,\sigma\,\sqrt{\pi a} \)</div>
+          <div style="margin-top:6px;">Failure if \(K \ge K_{IC}\)</div>
+
+          <div class="vars">
+            <span class="lbl">Variables</span>
+            <ul>
+              <li>\(K\): stress intensity factor (Mode I here)</li>
+              <li>\(\sigma\): applied (nominal) stress</li>
+              <li>\(a\): crack size parameter</li>
+              <li>\(f\): geometry factor (also written \(Y\))</li>
+              <li>\(K_{IC}\): plane-strain fracture toughness</li>
+            </ul>
+            <div style="margin-top:8px;">
+              <b>\(a\) vs \(2a\):</b> Center crack is often labeled total length \(2a\) (so \(a\) is half-length).
+              Edge cracks are usually just labeled \(a\) from the edge inward. Keep your \(a\) definition consistent with \(f\).
+            </div>
+          </div>
+        </div>
+
+        <div class="tip"><b>When to use</b><br>One-time/slow loading where a flaw controls immediate failure.</div>
+      </div>
         <!-- ALL YOUR ORIGINAL CONTENT REMAINS EXACTLY HERE -->
 
       </div>
