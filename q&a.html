@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Q&A Page</title>
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-XXXXXXXXXX');
+    </script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f4f6f8;
+        }
+
+        header {
+            background: #24292e;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1, h2 {
+            margin-top: 0;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: #0366d6;
+            font-weight: bold;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .info-box {
+            background: #eef6ff;
+            padding: 15px;
+            border-left: 4px solid #0366d6;
+            margin-bottom: 25px;
+            border-radius: 6px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 15px;
+            font-size: 14px;
+            color: gray;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Q&A Discussion Board</h1>
+    <p>Ask questions and help others by answering</p>
+</header>
+
+<div class="container">
+
+    <a href="index.html" class="back-link">← Back to Home</a>
+
+    <h2>Ask or Answer Questions</h2>
+
+    <div class="info-box">
+        💡 Sign in with GitHub to ask a question or post an answer.
+    </div>
+
+    <!-- GISCUS Q&A SYSTEM -->
+    <script src="https://giscus.app/client.js"
+        data-repo="YOUR_USERNAME/YOUR_REPO"
+        data-repo-id="YOUR_REPO_ID"
+        data-category="Q&A"
+        data-category-id="YOUR_CATEGORY_ID"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-input-position="top"
+        data-theme="light"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+    </script>
+
+</div>
+
+<footer>
+    <p>Powered by GitHub Discussions • Analytics enabled</p>
+</footer>
+
+</body>
+</html>
