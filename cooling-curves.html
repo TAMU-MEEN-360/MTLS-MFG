@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cooling Curves</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            background: #f4f6f9;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 60px auto;
+            padding: 0 20px 50px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.3rem;
+            color: #2c3e50;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 18px;
+        }
+
+        .credit {
+            text-align: center;
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 40px;
+        }
+
+        .section {
+            margin-bottom: 50px;
+        }
+
+        .section h2 {
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            padding-left: 12px;
+            border-left: 5px solid #7f8c8d;
+            color: #7f8c8d;
+        }
+
+        .note {
+            background: white;
+            padding: 18px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            margin-bottom: 24px;
+        }
+
+        .note p {
+            margin: 0;
+            line-height: 1.6;
+            color: #444;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 18px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-top: 4px solid #7f8c8d;
+        }
+
+        .card img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 14px;
+            background: #eee;
+            display: block;
+        }
+
+        .card h3 {
+            margin-top: 0;
+            margin-bottom: 12px;
+            color: #2c3e50;
+            font-size: 1.15rem;
+        }
+
+        .card p {
+            font-size: 0.92rem;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .mini-credit {
+            margin-top: 10px;
+            font-size: 0.84rem;
+            color: #777;
+        }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .back-wrap {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .back-link {
+            color: #2980b9;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        @media (max-width: 800px) {
+            .two-col {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <h1>Cooling Curves</h1>
+    <p class="subtitle">Using temperature–time curves to understand phase transformations in Pb-Sn alloys</p>
+
+    <p class="credit">
+        Credit: Cooling curve illustrations and supporting material derived from Megan Dawkins (Spring 2018).
+    </p>
+
+    <div class="section">
+        <h2>How to Use This Page</h2>
+        <div class="note">
+            <p>
+                Cooling curves show what happens to temperature over time as an alloy cools and solidifies.
+                Use them together with the phase diagram to identify when a liquid begins to form solid,
+                when a eutectic reaction occurs, and why some curves show a thermal arrest or plateau.
+            </p>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Key Cooling Curves</h2>
+        <div class="grid">
+
+            <div class="card">
+                <img src="images/eutectic cooling curve.JPG" alt="Eutectic cooling curve">
+                <h3>Eutectic Cooling Curve</h3>
+                <p>
+                    At the eutectic composition, the temperature drops until it reaches the eutectic temperature,
+                    then remains temporarily constant while the liquid transforms into α + β.
+                    This flat region indicates latent heat release during the eutectic reaction.
+                </p>
+                <p class="mini-credit">Source adapted from Megan Dawkins (Spring 2018).</p>
+            </div>
+
+            <div class="card">
+                <img src="images/wt30coolingcurve.JPG" alt="30 wt percent Sn cooling curve">
+                <h3>Hypoeutectic Cooling Curve (30 wt% Sn)</h3>
+                <p>
+                    For a hypoeutectic alloy, solidification begins above the eutectic temperature as primary α forms first.
+                    The remaining liquid continues cooling until the eutectic temperature is reached,
+                    where the rest of the liquid transforms into α + β.
+                </p>
+                <p class="mini-credit">Source adapted from Megan Dawkins (Spring 2018).</p>
+            </div>
+
+            <div class="card">
+                <img src="images/region2coolingcurve.JPG" alt="Cooling curve and phase diagram connection">
+                <h3>Cooling Curve Linked to the Phase Diagram</h3>
+                <p>
+                    This visual connects the path followed during cooling to the corresponding location on the Pb-Sn phase diagram.
+                    It helps show when the alloy crosses the liquidus and when the eutectic reaction begins.
+                </p>
+                <p class="mini-credit">Source adapted from Megan Dawkins (Spring 2018).</p>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>What to Look For</h2>
+        <div class="two-col">
+
+            <div class="note">
+                <p>
+                    <strong>Above the liquidus:</strong> the alloy is fully liquid, so temperature changes smoothly with time.
+                </p>
+                <p style="margin-top: 12px;">
+                    <strong>Crossing the liquidus:</strong> the first solid begins to form. For hypoeutectic alloys, this is usually primary α.
+                </p>
+                <p style="margin-top: 12px;">
+                    <strong>At the eutectic temperature:</strong> any remaining liquid transforms into α + β.
+                </p>
+            </div>
+
+            <div class="note">
+                <p>
+                    <strong>Plateau or thermal arrest:</strong> this happens because energy is released during phase transformation,
+                    temporarily slowing the temperature drop.
+                </p>
+                <p style="margin-top: 12px;">
+                    <strong>Final structure:</strong> the cooling curve helps explain why some alloys end with primary α plus eutectic,
+                    while the eutectic composition forms only eutectic α + β.
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Connection to Other Chapter 10 Tools</h2>
+        <div class="note">
+            <p>
+                Use the <strong>Pb-Sn Phase Diagram Tool</strong> to identify phases at a given composition and temperature,
+                then use the <strong>Microstructure Evolution</strong> page to see what those phases look like physically.
+                This page bridges those two by showing the alloy's path through cooling over time.
+            </p>
+        </div>
+    </div>
+
+    <div class="back-wrap">
+        <a class="back-link" href="index.html">← Back to Home</a>
+    </div>
+
+</div>
+</body>
+</html>
