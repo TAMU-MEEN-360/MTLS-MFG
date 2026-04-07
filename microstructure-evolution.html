@@ -98,19 +98,7 @@
             border-radius: 8px;
             margin-bottom: 14px;
             background: #eee;
-        }
-
-        .back-link {
-            display: inline-block;
-            margin-top: 10px;
-            color: #2980b9;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .back-wrap {
-            text-align: center;
-            margin-top: 20px;
+            display: block;
         }
 
         .mini-credit {
@@ -119,127 +107,133 @@
             color: #777;
         }
 
-        @media (max-width: 650px) {
-            h1 {
-                font-size: 1.9rem;
-            }
+        .back-wrap {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .back-link {
+            color: #2980b9;
+            text-decoration: none;
+            font-weight: 600;
         }
     </style>
 </head>
+
 <body>
-    <div class="container">
+<div class="container">
 
-        <h1>Microstructure Evolution</h1>
-        <p class="subtitle">Visual study tool for how Pb-Sn microstructures change during cooling</p>
-        <p class="credit">
-            Credit: Microstructure images and supporting material derived from Megan Dawkins (Spring 2018).
-        </p>
+    <h1>Microstructure Evolution</h1>
+    <p class="subtitle">Visual study tool for how Pb-Sn microstructures change during cooling</p>
 
-        <div class="section">
-            <h2>How to Use This Page</h2>
-            <div class="note">
-                <p>
-                    Use these visuals to connect the phase diagram to what the alloy actually looks like as it cools.
-                    Focus on when liquid is present, when a primary phase begins forming, and what the final
-                    microstructure looks like below the eutectic temperature.
-                </p>
-            </div>
+    <p class="credit">
+        Credit: Microstructure images and supporting material derived from Megan Dawkins (Spring 2018).
+    </p>
+
+    <div class="section">
+        <h2>How to Use This Page</h2>
+        <div class="note">
+            <p>
+                Follow the progression from liquid to two-phase regions to the final solid structure.
+                Use these images to connect the Pb-Sn phase diagram to what is physically happening in the alloy during cooling.
+            </p>
         </div>
-
-        <div class="section">
-            <h2>Phase Regions and Microstructures</h2>
-            <div class="grid">
-
-                <div class="card">
-                    <img src="liquid.JPG" alt="Liquid region image">
-                    <h3>Liquid</h3>
-                    <p>
-                        At sufficiently high temperature, the alloy is fully liquid. No solid microstructure has formed yet.
-                    </p>
-                    <p class="mini-credit">Source adapted from Megan Dawkins (Spring 2018).</p>
-                </div>
-
-                <div class="card">
-                    <img src="liquid_alpha.JPG" alt="Liquid plus alpha image">
-                    <h3>Liquid + Alpha</h3>
-                    <p>
-                        As the alloy cools into a two-phase region, primary α begins to form while liquid still remains.
-                    </p>
-                    <p class="mini-credit">Source adapted from Megan Dawkins (Spring 2018).</p>
-                </div>
-
-                <div class="card">
-                    <img src="liquid_alpha_lower.JPG" alt="Lower temperature liquid plus alpha image">
-                    <h3>Liquid + Alpha at Lower Temperature</h3>
-                    <p>
-                        Further cooling increases the amount of α while reducing the remaining liquid fraction.
-                    </p>
-                    <p class="mini-credit">Source adapted from Megan Dawkins (Spring 2018).</p>
-                </div>
-
-                <div class="card">
-                    <img src="eutectic_point.JPG" alt="Eutectic point image">
-                    <h3>Eutectic Point</h3>
-                    <p>
-                        At the eutectic composition and eutectic temperature, liquid transforms into α + β simultaneously.
-                    </p>
-                    <p class="mini-credit">Source adapted from Megan Dawkins (Spring 2018).</p>
-                </div>
-
-                <div class="card">
-                    <img src="alpha.JPG" alt="Alpha phase image">
-                    <h3>Alpha Phase</h3>
-                    <p>
-                        In the α single-phase region, the structure is fully solid and consists only of the α phase.
-                    </p>
-                    <p class="mini-credit">Source adapted from Megan Dawkins (Spring 2018).</p>
-                </div>
-
-                <div class="card">
-                    <img src="alpha_beta.JPG" alt="Alpha plus beta image">
-                    <h3>Alpha + Beta</h3>
-                    <p>
-                        Below the eutectic temperature, many compositions produce a final two-phase α + β microstructure.
-                    </p>
-                    <p class="mini-credit">Source adapted from Megan Dawkins (Spring 2018).</p>
-                </div>
-
-                <div class="card">
-                    <img src="eutectic_alpha_beta.JPG" alt="Eutectic alpha beta image">
-                    <h3>Eutectic Alpha + Beta</h3>
-                    <p>
-                        This image highlights the fine eutectic mixture that forms when the eutectic reaction occurs.
-                    </p>
-                    <p class="mini-credit">Source adapted from Megan Dawkins (Spring 2018).</p>
-                </div>
-
-                <div class="card">
-                    <img src="alpha_beta_hypoeutectic.JPG" alt="Hypoeutectic alpha beta image">
-                    <h3>Hypoeutectic Final Structure</h3>
-                    <p>
-                        A hypoeutectic alloy typically forms primary α first, followed by a eutectic mixture in the remaining regions.
-                    </p>
-                    <p class="mini-credit">Source adapted from Megan Dawkins (Spring 2018).</p>
-                </div>
-
-            </div>
-        </div>
-
-        <div class="section">
-            <h2>Cooling Path Connection</h2>
-            <div class="note">
-                <p>
-                    When you study these images, think in sequence: start above the liquidus, enter a liquid + solid region,
-                    follow the tie line behavior on the phase diagram, and then identify the final microstructure below the
-                    eutectic temperature.
-                </p>
-            </div>
-        </div>
-
-        <div class="back-wrap">
-            <a class="back-link" href="index.html">← Back to Home</a>
-        </div>
-
     </div>
+
+    <div class="section">
+        <h2>Phase Regions and Microstructures</h2>
+
+        <div class="grid">
+
+            <div class="card">
+                <img src="liquid.JPG" alt="Liquid region image">
+                <h3>Liquid</h3>
+                <p>
+                    At sufficiently high temperature, the alloy is fully liquid and no solid microstructure has formed yet.
+                </p>
+                <p class="mini-credit">Source adapted from Megan Dawkins (Spring 2018).</p>
+            </div>
+
+            <div class="card">
+                <img src="liquid_alpha.JPG" alt="Liquid plus alpha image">
+                <h3>Liquid + Alpha</h3>
+                <p>
+                    As the alloy cools into a two-phase region, primary α begins to form while liquid still remains.
+                </p>
+                <p class="mini-credit">Source adapted from Megan Dawkins (Spring 2018).</p>
+            </div>
+
+            <div class="card">
+                <img src="liquid_alpha_lower.JPG" alt="Lower temperature liquid plus alpha image">
+                <h3>Liquid + Alpha at Lower Temperature</h3>
+                <p>
+                    Further cooling increases the amount of α while reducing the remaining liquid fraction.
+                </p>
+                <p class="mini-credit">Source adapted from Megan Dawkins (Spring 2018).</p>
+            </div>
+
+            <div class="card">
+                <img src="eutectic_point.JPG" alt="Eutectic point image">
+                <h3>Eutectic Point</h3>
+                <p>
+                    At the eutectic composition and eutectic temperature, liquid transforms into α + β simultaneously.
+                </p>
+                <p class="mini-credit">Source adapted from Megan Dawkins (Spring 2018).</p>
+            </div>
+
+            <div class="card">
+                <img src="alpha.JPG" alt="Alpha phase image">
+                <h3>Alpha Phase</h3>
+                <p>
+                    In the α single-phase region, the structure is fully solid and consists only of the α phase.
+                </p>
+                <p class="mini-credit">Source adapted from Megan Dawkins (Spring 2018).</p>
+            </div>
+
+            <div class="card">
+                <img src="alpha_beta.JPG" alt="Alpha plus beta image">
+                <h3>Alpha + Beta</h3>
+                <p>
+                    Below the eutectic temperature, many compositions produce a final two-phase α + β microstructure.
+                </p>
+                <p class="mini-credit">Source adapted from Megan Dawkins (Spring 2018).</p>
+            </div>
+
+            <div class="card">
+                <img src="eutectic_alpha_beta.JPG" alt="Eutectic alpha beta image">
+                <h3>Eutectic Alpha + Beta</h3>
+                <p>
+                    This image highlights the fine eutectic mixture that forms when the eutectic reaction occurs.
+                </p>
+                <p class="mini-credit">Source adapted from Megan Dawkins (Spring 2018).</p>
+            </div>
+
+            <div class="card">
+                <img src="alpha_beta_hypoeutectic.JPG" alt="Hypoeutectic alpha beta image">
+                <h3>Hypoeutectic Final Structure</h3>
+                <p>
+                    A hypoeutectic alloy typically forms primary α first, followed by a eutectic mixture in the remaining regions.
+                </p>
+                <p class="mini-credit">Source adapted from Megan Dawkins (Spring 2018).</p>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Cooling Path Connection</h2>
+        <div class="note">
+            <p>
+                Study these images in sequence: start above the liquidus, enter a liquid plus solid region,
+                and then identify the final microstructure after crossing below the eutectic temperature.
+            </p>
+        </div>
+    </div>
+
+    <div class="back-wrap">
+        <a class="back-link" href="index.html">← Back to Home</a>
+    </div>
+
+</div>
 </body>
 </html>
