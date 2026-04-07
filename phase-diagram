@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pb-Sn Phase Diagram Tool</title>
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.5;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 24px 16px 48px;
+    }
+
+    h1, h2, h3, p {
+      text-align: center;
+    }
+
+    .tool-block {
+      margin-top: 24px;
+      margin-bottom: 24px;
+    }
+
+    .input-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin: 20px 0 12px;
+    }
+
+    .input-row input {
+      padding: 8px 10px;
+      font-size: 1rem;
+      width: 180px;
+    }
+
+    .input-row button {
+      padding: 8px 14px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .credit {
+      font-size: 0.9rem;
+      color: #666;
+      margin-top: 8px;
+      text-align: center;
+    }
+
+    .note {
+      font-size: 0.95rem;
+      color: #444;
+      max-width: 850px;
+      margin: 0 auto 16px;
+    }
+
+    .results-table {
+      margin: 16px auto;
+      border-collapse: collapse;
+      min-width: 320px;
+    }
+
+    .results-table th,
+    .results-table td {
+      border: 1px solid #000;
+      padding: 8px 12px;
+      text-align: center;
+    }
+
+    .equation-box {
+      max-width: 850px;
+      margin: 18px auto;
+      padding: 14px 16px;
+      border: 1px solid #ccc;
+    }
+
+    .equation-box p {
+      text-align: left;
+      margin: 8px 0;
+      font-family: "Courier New", monospace;
+    }
+
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 24px;
+      font-size: 1rem;
+    }
+
+    .error-text {
+      text-align: center;
+      color: #b00020;
+      font-weight: bold;
+      min-height: 24px;
+    }
+
+    #phasePlot {
+      width: 100%;
+      height: 520px;
+    }
+
+    #tieLinePlot {
+      width: 100%;
+      height: 170px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Pb-Sn Phase Diagram Tool</h1>
+
+  <p class="note">
+    Enter alloy composition and temperature to identify the phase region, calculate
+    phase compositions and amounts, and visualize the tie line.
+  </p>
+
+  <p class="credit">
+    Credit: Computational phase diagram logic and implementation adapted from Mihir Patil (Fall 2024).
+    Foundational phase-boundary modeling and data derived from Megan Dawkins (Spring 2018).
+  </p>
+
+  <div class="tool-block">
+    <h3>Inputs: Weight % Sn and Temperature</h3>
+
+    <div class="input-row">
+      <input id="wtInput" type="number" step="any" placeholder="wt% Sn" />
+      <input id="tempInput" type="number" step="any" placeholder="Temperature (°C)" />
+      <button onclick="runPhaseTool()">OK</button>
+      <button onclick="resetPhaseTool()">Reset</button>
+    </div>
+
+    <div id="errorText" class="error-text"></div>
+  </div>
+
+  <div id="phasePlot"></div>
+  <div id="tieLineContainer" style="display:none;">
+    <h2>Tie Line for Entered Alloy Composition and Temperature</h2>
+    <div id="tieLinePlot"></div>
+  </div>
+
+  <div id="leverRuleContainer" style="display:none;" class="equation-box">
+    <h2>Applying Lever Rule</h2>
+    <div id="leverRuleText"></div>
+  </div>
+
+  <div id="resultsContainer" style="display:none;">
+    <h2>Results</h2>
+    <table class="results-table">
+      <thead>
+        <tr>
+          <th>Quantity</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody id="resultsBody"></tbody>
+    </table>
+  </div>
+
+  <a class="back-link" href="./index.html">← Back to Home</a>
+
+  <script>
+    function curveData() {
+      const x1 = linspace(0, 18.3, 300);
+      const y1 = x1.map(x => -0.0127*x**3 - 0.0163*x**2 - 3.3235*x + 327.03);
+
+      const x2 = linspace(0, 61.9, 300);
+      const y2 = x2.map(x => -2.3263*x + 327);
+
+      const x3 = linspace(61.9, 100, 300);
+      const y3 = x3.map(x => 1.2861*x + 103.99);
+
+      const x4 = linspace(18.3, 97.8, 300);
+      const y4 = x4.map(() => 183);
+
+      const x5 = linspace(2.5, 18.3, 300);
+      const y5 = x5.map(x => 65.809*Math.log(x) - 8.3001);
+
+      const x6 = linspace(97.8, 100, 300);
+      const y6 = x6.map(x => 22.273*x - 1995.3);
+
+      const x7 = linspace(97.8, 99.2, 300);
+      const y7 = x7.map(x => -93.571*x + 9334.3);
+
+      return [
+        { x: x1, y: y1, mode: 'lines', name: '', line: { color: 'black' }, hoverinfo: 'skip', showlegend: false },
+        { x: x2, y: y2, mode: 'lines', name: '', line: { color: 'black' }, hoverinfo: 'skip', showlegend: false },
+        { x: x3, y: y3, mode: 'lines', name: '', line: { color: 'black' }, hoverinfo: 'skip', showlegend: false },
+        { x: x4, y: y4, mode: 'lines', name: '', line: { color: 'black' }, hoverinfo: 'skip', showlegend: false },
+        { x: x5, y: y5, mode: 'lines', name: '', line: { color: 'black' }, hoverinfo: 'skip', showlegend: false },
+        { x: x6, y: y6, mode: 'lines', name: '', line: { color: 'black' }, hoverinfo: 'skip', showlegend: false },
+        { x: x7, y: y7, mode: 'lines', name: '', line: { color: 'black' }, hoverinfo: 'skip', showlegend: false }
+      ];
+    }
+
+    function baseLayout(titleText = 'Lead-Tin Phase Diagram') {
+      return {
+        title: { text: titleText },
+        xaxis: { title: 'wt% (Sn)', range: [0, 100] },
+        yaxis: { title: 'Temperature (°C)', range: [52, 350] },
+        margin: { t: 50, r: 20, b: 60, l: 60 }
+      };
+    }
+
+    function linspace(start, end, n) {
+      const arr = [];
+      const step = (end - start) / (n - 1);
+      for (let i = 0; i < n; i++) {
+        arr.push(start + i * step);
+      }
+      return arr;
+    }
+
+    function validateUserInput(wt, T) {
+      if (Number.isNaN(wt) || Number.isNaN(T)) {
+        return [false, 'Please enter both values.'];
+      }
+      if (wt < 0 || wt > 100) {
+        return [false, 'wt% Sn must be between 0 and 100.'];
+      }
+      if (T < 52 || T > 350) {
+        return [false, 'Temperature must be between 52 and 350 °C.'];
+      }
+      return [true, 'Valid inputs.'];
+    }
+
+    function findPhase(wt, T) {
+      const y1 = -0.0127*wt**3 - 0.0163*wt**2 - 3.3235*wt + 327.03;
+      const y2 = -2.3263*wt + 327;
+      const y3 = 1.2861*wt + 103.99;
+      const y4 = 183;
+      const y5 = 65.809*Math.log(wt) - 8.3001;
+      const y6 = 22.273*wt - 1995.3;
+      const y7 = -93.571*wt + 9334.3;
+
+      if (wt <= 18.3) {
+        if (T >= y2) return 1;
+        else if (T >= y1) return 3;
+        else if (T >= y5) return 2;
+        else return 6;
+      } else if (wt <= 61.9) {
+        if (T >= y2) return 1;
+        else if (T >= y4) return 3;
+        else return 6;
+      } else if (wt <= 97.8) {
+        if (T >= y3) return 1;
+        else if (T >= y4) return 4;
+        else return 6;
+      } else {
+        if (T >= y3) return 1;
+        else if (T >= y6) return 4;
+        else if (T <= y7) return 6;
+        else return 5;
+      }
+    }
+
+    function findComposition(wt, T, phase) {
+      const x1 = -5.55E-06*T**3 + 0.00361*T**2 - 0.84*T + 85.149;
+      const x2 = -0.42987*(T - 327);
+      const x3 = 0.777545*(T - 103.99);
+      const x5 = Math.exp((T + 8.3001)/65.809);
+      const x6 = 0.044897*(T + 1995.3);
+      const x7 = -0.011638*(T - 8584.7);
+
+      let phaseName = '';
+      let comp_alpha = 0, comp_liquid = 0, comp_beta = 0;
+      let amount_alpha = 0, amount_liquid = 0, amount_beta = 0;
+      let tieLine = null;
+
+      if (wt === 61.9 && T === 183) {
+        phaseName = 'Eutectic Point: Liquid → Alpha + Beta';
+      } else if (phase === 1) {
+        phaseName = 'Liquid';
+        comp_liquid = wt;
+        amount_liquid = 100;
+      } else if (phase === 2) {
+        phaseName = 'Alpha';
+        comp_alpha = wt;
+        amount_alpha = 100;
+      } else if (phase === 3) {
+        phaseName = 'Alpha + Liquid';
+        comp_alpha = x1;
+        comp_liquid = x2;
+        amount_alpha = ((comp_liquid - wt) / (comp_liquid - comp_alpha)) * 100;
+        amount_liquid = ((wt - comp_alpha) / (comp_liquid - comp_alpha)) * 100;
+        tieLine = [comp_alpha, comp_liquid];
+      } else if (phase === 4) {
+        phaseName = 'Liquid + Beta';
+        comp_liquid = x3;
+        comp_beta = x6;
+        amount_liquid = ((comp_beta - wt) / (comp_beta - comp_liquid)) * 100;
+        amount_beta = ((wt - comp_liquid) / (comp_beta - comp_liquid)) * 100;
+        tieLine = [comp_liquid, comp_beta];
+      } else if (phase === 5) {
+        phaseName = 'Beta';
+        comp_beta = wt;
+        amount_beta = 100;
+      } else if (phase === 6) {
+        phaseName = 'Alpha + Beta';
+        comp_alpha = x5;
+        comp_beta = x7;
+        amount_alpha = ((comp_beta - wt) / (comp_beta - comp_alpha)) * 100;
+        amount_beta = ((wt - comp_alpha) / (comp_beta - comp_alpha)) * 100;
+        tieLine = [comp_alpha, comp_beta];
+      }
+
+      return {
+        phaseName,
+        comp_alpha,
+        amount_alpha,
+        comp_liquid,
+        amount_liquid,
+        comp_beta,
+        amount_beta,
+        tieLine
+      };
+    }
+
+    function formatPct(value) {
+      return `${value.toFixed(2)}% Sn`;
+    }
+
+    function drawBasePlot() {
+      Plotly.newPlot('phasePlot', curveData(), baseLayout(), { responsive: true });
+    }
+
+    function drawUpdatedPlot(wt, T, tieLine) {
+      const traces = curveData();
+
+      traces.push({
+        x: [wt],
+        y: [T],
+        mode: 'markers',
+        marker: { size: 10, color: 'red' },
+        name: 'Selected Point'
+      });
+
+      traces.push({
+        x: [wt, wt],
+        y: [52, T],
+        mode: 'lines',
+        line: { color: 'black', dash: 'dot' },
+        hoverinfo: 'skip',
+        showlegend: false
+      });
+
+      if (tieLine) {
+        traces.push({
+          x: [tieLine[0], tieLine[1]],
+          y: [T, T],
+          mode: 'lines',
+          line: { color: 'cyan', width: 3 },
+          name: 'Tie Line'
+        });
+      }
+
+      Plotly.newPlot(
+        'phasePlot',
+        traces,
+        baseLayout('Updated Lead-Tin Phase Diagram'),
+        { responsive: true }
+      );
+    }
+
+    function drawTieLinePlot(wt, T, tieLine) {
+      const xMin = Math.min(tieLine[0], wt) - 5;
+      const xMax = Math.max(tieLine[1], wt) + 5;
+
+      const traces = [
+        {
+          x: [tieLine[0], tieLine[1]],
+          y: [T, T],
+          mode: 'lines',
+          line: { color: 'black', width: 3 },
+          hoverinfo: 'skip',
+          showlegend: false
+        },
+        {
+          x: [wt],
+          y: [T],
+          mode: 'markers+text',
+          text: [`${wt.toFixed(1)}% Sn`],
+          textposition: 'top center',
+          marker: { size: 10, color: 'red' },
+          hoverinfo: 'skip',
+          showlegend: false
+        }
+      ];
+
+      const layout = {
+        margin: { t: 10, r: 20, b: 40, l: 20 },
+        xaxis: {
+          range: [xMin, xMax],
+          tickmode: 'array',
+          tickvals: [tieLine[0], tieLine[1], wt],
+          ticktext: [
+            `${tieLine[0].toFixed(1)}%`,
+            `${tieLine[1].toFixed(1)}%`,
+            `${wt.toFixed(1)}%`
+          ]
+        },
+        yaxis: {
+          visible: false,
+          range: [T - 1, T + 1]
+        }
+      };
+
+      Plotly.newPlot('tieLinePlot', traces, layout, { responsive: true });
+    }
+
+    function fillResults(wt, T, result) {
+      const rows = [
+        ['wt% Sn', `${wt.toFixed(1)}% Sn`],
+        ['Temperature', `${T.toFixed(1)} °C`],
+        ['Phases', result.phaseName]
+      ];
+
+      if (result.comp_alpha !== 0) rows.push(['Alpha Comp', formatPct(result.comp_alpha)]);
+      if (result.amount_alpha !== 0) rows.push(['Alpha Amount', `${result.amount_alpha.toFixed(2)}%`]);
+      if (result.comp_liquid !== 0) rows.push(['Liquid Comp', formatPct(result.comp_liquid)]);
+      if (result.amount_liquid !== 0) rows.push(['Liquid Amount', `${result.amount_liquid.toFixed(2)}%`]);
+      if (result.comp_beta !== 0) rows.push(['Beta Comp', formatPct(result.comp_beta)]);
+      if (result.amount_beta !== 0) rows.push(['Beta Amount', `${result.amount_beta.toFixed(2)}%`]);
+
+      const tbody = document.getElementById('resultsBody');
+      tbody.innerHTML = rows.map(([q, v]) => `<tr><td>${q}</td><td>${v}</td></tr>`).join('');
+      document.getElementById('resultsContainer').style.display = 'block';
+    }
+
+    function fillLeverRule(wt, result) {
+      const box = document.getElementById('leverRuleText');
+
+      if (!result.tieLine) {
+        document.getElementById('leverRuleContainer').style.display = 'none';
+        return;
+      }
+
+      let leftName = '';
+      let rightName = '';
+      let leftComp = 0;
+      let rightComp = 0;
+      let leftAmtName = '';
+      let rightAmtName = '';
+
+      if (result.phaseName === 'Alpha + Liquid') {
+        leftName = 'Alpha';
+        rightName = 'Liquid';
+        leftComp = result.comp_alpha;
+        rightComp = result.comp_liquid;
+        leftAmtName = 'Alpha fraction';
+        rightAmtName = 'Liquid fraction';
+      } else if (result.phaseName === 'Liquid + Beta') {
+        leftName = 'Liquid';
+        rightName = 'Beta';
+        leftComp = result.comp_liquid;
+        rightComp = result.comp_beta;
+        leftAmtName = 'Liquid fraction';
+        rightAmtName = 'Beta fraction';
+      } else if (result.phaseName === 'Alpha + Beta') {
+        leftName = 'Alpha';
+        rightName = 'Beta';
+        leftComp = result.comp_alpha;
+        rightComp = result.comp_beta;
+        leftAmtName = 'Alpha fraction';
+        rightAmtName = 'Beta fraction';
+      }
+
+      box.innerHTML = `
+        <p>${leftAmtName} = (${rightComp.toFixed(2)} - ${wt.toFixed(2)}) / (${rightComp.toFixed(2)} - ${leftComp.toFixed(2)})</p>
+        <p>${rightAmtName} = (${wt.toFixed(2)} - ${leftComp.toFixed(2)}) / (${rightComp.toFixed(2)} - ${leftComp.toFixed(2)})</p>
+      `;
+
+      document.getElementById('leverRuleContainer').style.display = 'block';
+    }
+
+    function runPhaseTool() {
+      const wt = parseFloat(document.getElementById('wtInput').value);
+      const T = parseFloat(document.getElementById('tempInput').value);
+      const [valid, message] = validateUserInput(wt, T);
+
+      document.getElementById('errorText').textContent = '';
+      document.getElementById('resultsContainer').style.display = 'none';
+      document.getElementById('tieLineContainer').style.display = 'none';
+      document.getElementById('leverRuleContainer').style.display = 'none';
+
+      if (!valid) {
+        document.getElementById('errorText').textContent = message;
+        drawBasePlot();
+        return;
+      }
+
+      const phase = findPhase(wt, T);
+      const result = findComposition(wt, T, phase);
+
+      drawUpdatedPlot(wt, T, result.tieLine);
+      fillResults(wt, T, result);
+      fillLeverRule(wt, result);
+
+      if (result.tieLine) {
+        drawTieLinePlot(wt, T, result.tieLine);
+        document.getElementById('tieLineContainer').style.display = 'block';
+      }
+    }
+
+    function resetPhaseTool() {
+      document.getElementById('wtInput').value = '';
+      document.getElementById('tempInput').value = '';
+      document.getElementById('errorText').textContent = '';
+      document.getElementById('resultsContainer').style.display = 'none';
+      document.getElementById('tieLineContainer').style.display = 'none';
+      document.getElementById('leverRuleContainer').style.display = 'none';
+      drawBasePlot();
+    }
+
+    drawBasePlot();
+  </script>
+</body>
+</html>
