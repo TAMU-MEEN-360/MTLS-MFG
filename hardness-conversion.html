@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hardness Conversion Tool</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            background: #f4f6f9;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 60px auto;
+            padding: 0 20px 50px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.3rem;
+            color: #2c3e50;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 18px;
+        }
+
+        .credit {
+            text-align: center;
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            padding-left: 12px;
+            border-left: 5px solid #8e44ad;
+            color: #8e44ad;
+        }
+
+        .note,
+        .tool-box {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .note p {
+            margin: 0;
+            line-height: 1.6;
+            color: #444;
+        }
+
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            align-items: end;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #2c3e50;
+        }
+
+        select,
+        input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 18px;
+        }
+
+        button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #8e44ad;
+            color: white;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #7d3c98;
+        }
+
+        .secondary-btn {
+            background: #7f8c8d;
+        }
+
+        .secondary-btn:hover {
+            background: #6c7a7a;
+        }
+
+        .status {
+            margin-top: 14px;
+            font-size: 0.95rem;
+            color: #666;
+        }
+
+        .error {
+            color: #c0392b;
+            font-weight: 600;
+        }
+
+        .success {
+            color: #16a085;
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        th, td {
+            padding: 12px 14px;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+        }
+
+        th {
+            background: #fafafa;
+            color: #2c3e50;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .muted {
+            color: #777;
+            font-size: 0.92rem;
+        }
+
+        .back-wrap {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .back-link {
+            color: #2980b9;
+            text-decoration: none;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h1>Hardness Conversion Tool</h1>
+    <p class="subtitle">Convert between common hardness scales using the original conversion table</p>
+
+    <p class="credit">
+        Credit: Hardness conversion data and implementation adapted from Taylor Liang (Fall 2018).
+    </p>
+
+    <div class="section">
+        <h2>How to Use This Page</h2>
+        <div class="note">
+            <p>
+                Select the scale you know, enter a hardness value, and the tool will find the closest row in the
+                original conversion table and display the corresponding values in the other scales.
+            </p>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Converter</h2>
+        <div class="tool-box">
+            <div class="tool-grid">
+                <div>
+                    <label for="scaleSelect">Known Scale</label>
+                    <select id="scaleSelect"></select>
+                </div>
+
+                <div>
+                    <label for="hardnessInput">Known Value</label>
+                    <input id="hardnessInput" type="number" step="any" placeholder="Enter hardness value">
+                </div>
+            </div>
+
+            <div class="button-row">
+                <button onclick="convertHardness()">Convert</button>
+                <button class="secondary-btn" onclick="resetTool()">Reset</button>
+            </div>
+
+            <div id="status" class="status">Loading conversion table...</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Results</h2>
+        <table id="resultsTable" style="display:none;">
+            <thead>
+                <tr>
+                    <th>Scale</th>
+                    <th>Converted Value</th>
+                </tr>
+            </thead>
+            <tbody id="resultsBody"></tbody>
+        </table>
+        <p id="closestMatch" class="muted"></p>
+    </div>
+
+    <div class="back-wrap">
+        <a class="back-link" href="index.html">← Back to Home</a>
+    </div>
+
+</div>
+
+<script>
+    const csvPath = "Hardness%20Conversion%20Table.csv";
+
+    const scaleLabels = [
+        "HRA",
+        "HRB",
+        "HRC",
+        "HRD",
+        "HRE",
+        "HRF",
+        "HR15N",
+        "HR30N",
+        "HR45N",
+        "HR30T",
+        "Brinell (3000 kg)",
+        "Brinell (500 kg)",
+        "Vickers (HV)",
+        "Shore",
+        "Tensile Strength (psi)",
+        "Tensile Strength (MPa)"
+    ];
+
+    let tableData = [];
+
+    async function loadCSV() {
+        const status = document.getElementById("status");
+
+        try {
+            const response = await fetch(csvPath);
+            if (!response.ok) throw new Error("CSV file not found.");
+
+            const text = await response.text();
+            const lines = text.trim().split(/\r?\n/);
+
+            tableData = lines.slice(1).map(line => {
+                const cells = line.split(",");
+                return cells.map(cell => {
+                    const trimmed = cell.trim();
+                    return trimmed === "" ? null : Number(trimmed);
+                });
+            });
+
+            populateScaleDropdown();
+            status.textContent = "Conversion table loaded.";
+            status.className = "status success";
+        } catch (error) {
+            status.textContent = "Could not load Hardness Conversion Table.csv. Make sure it is in the same folder as this HTML file.";
+            status.className = "status error";
+        }
+    }
+
+    function populateScaleDropdown() {
+        const select = document.getElementById("scaleSelect");
+        select.innerHTML = "";
+
+        scaleLabels.forEach((label, index) => {
+            const option = document.createElement("option");
+            option.value = index;
+            option.textContent = label;
+            select.appendChild(option);
+        });
+    }
+
+    function convertHardness() {
+        const status = document.getElementById("status");
+        const scaleIndex = Number(document.getElementById("scaleSelect").value);
+        const inputValue = Number(document.getElementById("hardnessInput").value);
+        const resultsTable = document.getElementById("resultsTable");
+        const resultsBody = document.getElementById("resultsBody");
+        const closestMatch = document.getElementById("closestMatch");
+
+        resultsBody.innerHTML = "";
+        resultsTable.style.display = "none";
+        closestMatch.textContent = "";
+
+        if (!tableData.length) {
+            status.textContent = "Conversion table has not loaded yet.";
+            status.className = "status error";
+            return;
+        }
+
+        if (Number.isNaN(inputValue)) {
+            status.textContent = "Please enter a hardness value.";
+            status.className = "status error";
+            return;
+        }
+
+        const validRows = tableData.filter(row => row[scaleIndex] !== null && !Number.isNaN(row[scaleIndex]));
+        if (!validRows.length) {
+            status.textContent = "No data available for that scale.";
+            status.className = "status error";
+            return;
+        }
+
+        let bestRow = validRows[0];
+        let smallestDiff = Math.abs(validRows[0][scaleIndex] - inputValue);
+
+        for (const row of validRows) {
+            const diff = Math.abs(row[scaleIndex] - inputValue);
+            if (diff < smallestDiff) {
+                smallestDiff = diff;
+                bestRow = row;
+            }
+        }
+
+        scaleLabels.forEach((label, i) => {
+            const row = document.createElement("tr");
+
+            const scaleCell = document.createElement("td");
+            scaleCell.textContent = label;
+
+            const valueCell = document.createElement("td");
+            valueCell.textContent = bestRow[i] !== null && !Number.isNaN(bestRow[i]) ? bestRow[i] : "—";
+
+            row.appendChild(scaleCell);
+            row.appendChild(valueCell);
+            resultsBody.appendChild(row);
+        });
+
+        resultsTable.style.display = "table";
+        status.textContent = "Closest table match found.";
+        status.className = "status success";
+        closestMatch.textContent =
+            `Closest matching row based on ${scaleLabels[scaleIndex]} = ${bestRow[scaleIndex]}.`;
+    }
+
+    function resetTool() {
+        document.getElementById("hardnessInput").value = "";
+        document.getElementById("resultsBody").innerHTML = "";
+        document.getElementById("resultsTable").style.display = "none";
+        document.getElementById("closestMatch").textContent = "";
+        document.getElementById("status").textContent = tableData.length
+            ? "Conversion table loaded."
+            : "Loading conversion table...";
+        document.getElementById("status").className = tableData.length
+            ? "status success"
+            : "status";
+    }
+
+    loadCSV();
+</script>
+</body>
+</html>
