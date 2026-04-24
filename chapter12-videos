@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 12 Review Videos</title>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-8W1VHEV9FE"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-8W1VHEV9FE');
+</script>
+
+<style>
+body {
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    background: #f4f6f9;
+    color: #333;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 60px auto;
+    padding: 0 20px;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 2.3rem;
+}
+
+.subtitle {
+    text-align: center;
+    color: #666;
+    margin-bottom: 50px;
+}
+
+.chapter h2 {
+    border-left: 5px solid #500000;
+    padding-left: 12px;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+}
+
+.video {
+    margin-bottom: 30px;
+}
+
+.video-title {
+    color: #500000;
+    font-weight: 500;
+    margin-bottom: 8px;
+    display: block;
+}
+
+iframe {
+    width: 100%;
+    max-width: 560px;
+    height: 315px;
+    border-radius: 8px;
+    border: none;
+}
+
+.back {
+    margin-top: 40px;
+    display: inline-block;
+    color: #500000;
+    text-decoration: none;
+}
+
+.back:hover {
+    text-decoration: underline;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Chapter 12 Review Videos</h1>
+<p class="subtitle">Transformation & Strengthening Mechanisms</p>
+
+<div class="chapter">
+<h2>Phase Transformations & Hardening</h2>
+
+<div class="video">
+<span class="video-title">Aluminum Changes World</span>
+<iframe src="https://www.youtube.com/embed/yn9qhQSMCRk" allowfullscreen></iframe>
+</div>
+
+<div class="video">
+<span class="video-title">Age Hardening Discovery</span>
+<iframe src="https://www.youtube.com/embed/phhXy1XgLLs" allowfullscreen></iframe>
+</div>
+
+<div class="video">
+<span class="video-title">Martensitic Transformation</span>
+<iframe src="https://www.youtube.com/embed/OQ5lVjYssko" allowfullscreen></iframe>
+</div>
+
+<div class="video">
+<span class="video-title">Displacements due to Bainite Transformation</span>
+<iframe src="https://www.youtube.com/embed/NcdCkN15-jE" allowfullscreen></iframe>
+</div>
+
+</div>
+
+<a href="index.html" class="back">← Back to Study Tools Home</a>
+
+</div>
+
+</body>
+</html>
