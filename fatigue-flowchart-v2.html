@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <title>Failure Scenarios Flowchart</title>
 
- <!-- Google tag (gtag.js) -->
+<!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-8W1VHEV9FE"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -24,7 +24,6 @@ window.MathJax = {
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 
 <style>
-/* ALL YOUR ORIGINAL CSS IS UNCHANGED */
   body{
     font-family: Arial, sans-serif;
     margin:40px;
@@ -145,10 +144,14 @@ window.MathJax = {
     display:flex;
     align-items:center;
     justify-content:center;
+    height:110px;
   }
-  .imgBox svg{
+
+  .imgBox img{
     width:100%;
-    height:92px;
+    height:100%;
+    object-fit:contain;
+    border-radius:8px;
   }
 
   .examples{
@@ -214,26 +217,10 @@ window.MathJax = {
 
       <!-- STATIC + FLAW -->
       <div class="card" onclick="location.href='static_flaw.html'">
-        <div class="title">Static loading + flaw</div>
+        <div class="title">Static-loading + flaw</div>
 
-        <div class="imgBox" aria-label="Static loading with edge crack illustration">
-          <svg viewBox="0 0 320 120" role="img">
-            <!-- specimen -->
-            <rect x="90" y="18" width="170" height="84" rx="10" fill="rgba(255,255,255,0.92)"/>
-            <!-- EDGE crack on LEFT edge (no arrowhead) -->
-            <path d="M90 62
-                     C100 58, 102 66, 112 62
-                     C122 58, 124 66, 134 62
-                     C144 58, 146 66, 156 62"
-                  stroke="#111827" stroke-width="3" fill="none" stroke-linecap="round"/>
-
-            <!-- STATIC load arrows next to cracked edge -->
-            <path d="M65 30 L65 90" stroke="#16a34a" stroke-width="8" stroke-linecap="round"/>
-            <polygon points="65,22 54,38 76,38" fill="#16a34a"/>
-            <polygon points="65,98 54,82 76,82" fill="#16a34a"/>
-
-            <text x="132" y="16" fill="#16a34a" font-size="14" font-weight="700">STATIC</text>
-          </svg>
+        <div class="imgBox">
+          <img src="Images/static-loading.png" alt="Static loading with flaw">
         </div>
 
         <div class="eq">
@@ -246,12 +233,13 @@ window.MathJax = {
               <li>\(K\): stress intensity factor (Mode I here)</li>
               <li>\(\sigma\): applied (nominal) stress</li>
               <li>\(a\): crack size parameter</li>
-              <li>\(f\): geometry factor </li>
+              <li>\(f\): geometry factor</li>
               <li>\(K_{IC}\): plane-strain fracture toughness</li>
             </ul>
             <div style="margin-top:8px;">
-              <b>\(a\) vs \(2a\):</b> Center crack is often labeled total length \(2a\) (so \(a\) is half-length).
-              Edge cracks are usually just labeled \(a\) from the edge inward. Keep your \(a\) definition consistent with \(f\).
+              <b>\(a\) vs \(2a\):</b> Center crack is often labeled total length \(2a\) 
+              so \(a\) is half-length. Edge cracks are usually just labeled \(a\) from the edge inward.
+              Keep your \(a\) definition consistent with \(f\).
             </div>
           </div>
         </div>
@@ -263,29 +251,8 @@ window.MathJax = {
       <div class="card" onclick="location.href='fatigue_no_flaw.html'">
         <div class="title">Fatigue (no flaw)</div>
 
-        <div class="imgBox" aria-label="Fatigue test specimen illustration">
-          <svg viewBox="0 0 320 120" role="img">
-            <!-- grips -->
-            <rect x="18" y="44" width="58" height="32" rx="6" fill="rgba(255,255,255,0.92)"/>
-            <rect x="244" y="44" width="58" height="32" rx="6" fill="rgba(255,255,255,0.92)"/>
-            <!-- dogbone -->
-            <path d="M76 60
-                     C100 42, 120 42, 140 52
-                     L180 52
-                     C200 42, 220 42, 244 60
-                     C220 78, 200 78, 180 68
-                     L140 68
-                     C120 78, 100 78, 76 60 Z"
-                  fill="rgba(255,255,255,0.92)"/>
-
-            <!-- cyclic arrows -->
-            <path d="M160 20 L160 44" stroke="#60a5fa" stroke-width="8" stroke-linecap="round"/>
-            <polygon points="160,14 149,30 171,30" fill="#60a5fa"/>
-            <path d="M160 76 L160 100" stroke="#60a5fa" stroke-width="8" stroke-linecap="round"/>
-            <polygon points="160,106 149,90 171,90" fill="#60a5fa"/>
-
-            <text x="120" y="16" fill="#60a5fa" font-size="14" font-weight="700">CYCLIC</text>
-          </svg>
+        <div class="imgBox">
+          <img src="Images/fatigue-no-flaw.png" alt="Fatigue without flaw">
         </div>
 
         <div class="eq">
@@ -307,30 +274,12 @@ window.MathJax = {
         <div class="tip"><b>When to use</b><br>Cyclic loading when you assume no dominant pre-existing crack.</div>
       </div>
 
-
       <!-- FATIGUE + FLAW -->
       <div class="card" onclick="location.href='fatigue_flaw.html'">
         <div class="title">Fatigue + flaw</div>
 
-        <div class="imgBox" aria-label="Crack growth with cyclic loading illustration">
-          <svg viewBox="0 0 320 120" role="img">
-            <!-- specimen -->
-            <rect x="70" y="18" width="170" height="84" rx="10" fill="rgba(255,255,255,0.92)"/>
-            <!-- EDGE crack on RIGHT edge (no arrowhead) -->
-            <path d="M240 62
-                     C230 58, 228 66, 218 62
-                     C208 58, 206 66, 196 62
-                     C186 58, 184 66, 174 62"
-                  stroke="#111827" stroke-width="3" fill="none" stroke-linecap="round"/>
-
-            <!-- cyclic load arrows right next to cracked edge -->
-            <path d="M270 30 L270 90" stroke="#60a5fa" stroke-width="8" stroke-linecap="round"/>
-            <polygon points="270,22 259,38 281,38" fill="#60a5fa"/>
-            <polygon points="270,98 259,82 281,82" fill="#60a5fa"/>
-
-            <!-- NEW: explicit "CYCLIC" label near the load -->
-            <text x="238" y="16" fill="#60a5fa" font-size="14" font-weight="700">CYCLIC</text>
-          </svg>
+        <div class="imgBox">
+          <img src="Images/fatigue-flaw.png" alt="Fatigue with flaw">
         </div>
 
         <div class="eq">
@@ -348,7 +297,8 @@ window.MathJax = {
               <li>\(f\): geometry factor</li>
             </ul>
             <div style="margin-top:8px;">
-              <b>\(a\) vs \(2a\):</b> For a center crack, many texts label total length \(2a\). For an edge crack, length is usually \(a\).
+              <b>\(a\) vs \(2a\):</b> For a center crack, many texts label total length \(2a\). 
+              For an edge crack, length is usually \(a\).
             </div>
           </div>
         </div>
