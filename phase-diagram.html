@@ -199,9 +199,64 @@
         title: { text: titleText },
         xaxis: { title: 'wt% (Sn)', range: [0, 100] },
         yaxis: { title: 'Temperature (°C)', range: [52, 350] },
-        margin: { t: 50, r: 20, b: 60, l: 60 }
-      };
-    }
+        margin: { t: 50, r: 20, b: 60, l: 60 },
+
+        annotations: [
+        {
+        x: 50,
+        y: 305,
+        text: 'L',
+        showarrow: false,
+        font: { size: 22, color: 'black' }
+        },
+        {
+        x: 8,
+        y: 240,
+        text: 'α',
+        showarrow: false,
+        font: { size: 22, color: 'black' }
+        },
+        {
+        x: 28,
+        y: 225,
+        text: 'α + L',
+        showarrow: false,
+        font: { size: 20, color: 'black' }
+        },
+        {
+        x: 82,
+        y: 230,
+        text: 'L + β',
+        showarrow: false,
+        font: { size: 20, color: 'black' }
+        },
+        {
+        x: 99,
+        y: 135,
+        text: 'β',
+        showarrow: false,
+        font: { size: 22, color: 'black' }
+        },
+        {
+        x: 55,
+        y: 125,
+        text: 'α + β',
+        showarrow: false,
+        font: { size: 22, color: 'black' }
+        },
+        {
+        x: 61.9,
+        y: 177,
+        text: 'Eutectic',
+        showarrow: true,
+        arrowhead: 2,
+        ax: 0,
+        ay: 35,
+        font: { size: 13, color: 'black' }
+            }
+          ]
+        };
+      }
 
     function linspace(start, end, n) {
       const arr = [];
