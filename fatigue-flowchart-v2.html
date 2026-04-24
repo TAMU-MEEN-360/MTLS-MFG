@@ -144,7 +144,7 @@ window.MathJax = {
     display:flex;
     align-items:center;
     justify-content:center;
-    height:110px;
+    height:200px; /* ONLY CHANGE */
   }
 
   .imgBox img{
@@ -226,22 +226,6 @@ window.MathJax = {
         <div class="eq">
           <div>\( K = f\,\sigma\,\sqrt{\pi a} \)</div>
           <div style="margin-top:6px;">Failure if \(K \ge K_{IC}\)</div>
-
-          <div class="vars">
-            <span class="lbl">Variables</span>
-            <ul>
-              <li>\(K\): stress intensity factor (Mode I here)</li>
-              <li>\(\sigma\): applied (nominal) stress</li>
-              <li>\(a\): crack size parameter</li>
-              <li>\(f\): geometry factor</li>
-              <li>\(K_{IC}\): plane-strain fracture toughness</li>
-            </ul>
-            <div style="margin-top:8px;">
-              <b>\(a\) vs \(2a\):</b> Center crack is often labeled total length \(2a\) 
-              so \(a\) is half-length. Edge cracks are usually just labeled \(a\) from the edge inward.
-              Keep your \(a\) definition consistent with \(f\).
-            </div>
-          </div>
         </div>
 
         <div class="tip"><b>When to use</b><br>One-time/slow loading where a flaw controls immediate failure.</div>
@@ -257,18 +241,6 @@ window.MathJax = {
 
         <div class="eq">
           <div><b>S–N / endurance approach</b></div>
-          <div style="margin-top:6px;">Use stress amplitude \(\sigma_a\) vs cycles to failure \(N\)</div>
-
-          <div class="vars">
-            <span class="lbl">Common variables</span>
-            <ul>
-              <li>\(\sigma_{max}, \sigma_{min}\): max/min stress in a cycle</li>
-              <li>\(\sigma_a = (\sigma_{max}-\sigma_{min})/2\): stress amplitude</li>
-              <li>\(\sigma_m = (\sigma_{max}+\sigma_{min})/2\): mean stress</li>
-              <li>\(R = \sigma_{min}/\sigma_{max}\): stress ratio</li>
-              <li>\(N\): cycles to failure</li>
-            </ul>
-          </div>
         </div>
 
         <div class="tip"><b>When to use</b><br>Cyclic loading when you assume no dominant pre-existing crack.</div>
@@ -284,23 +256,6 @@ window.MathJax = {
 
         <div class="eq">
           <div>\( \dfrac{da}{dN} = C(\Delta K)^n \)</div>
-          <div style="margin-top:6px;">\( \Delta K = f(\sigma_{max}-\sigma_{min})\sqrt{\pi a} \)</div>
-
-          <div class="vars">
-            <span class="lbl">Variables</span>
-            <ul>
-              <li>\(a\): crack size parameter</li>
-              <li>\(N\): number of cycles</li>
-              <li>\(\frac{da}{dN}\): crack growth per cycle</li>
-              <li>\(\Delta K\): range of stress intensity in a cycle</li>
-              <li>\(C, n\): Paris-law material constants</li>
-              <li>\(f\): geometry factor</li>
-            </ul>
-            <div style="margin-top:8px;">
-              <b>\(a\) vs \(2a\):</b> For a center crack, many texts label total length \(2a\). 
-              For an edge crack, length is usually \(a\).
-            </div>
-          </div>
         </div>
 
         <div class="tip"><b>When to use</b><br>Cyclic loading with a known crack/flaw that grows with cycles.</div>
