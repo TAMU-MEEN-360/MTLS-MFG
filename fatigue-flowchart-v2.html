@@ -4,13 +4,14 @@
 <meta charset="UTF-8">
 <title>Failure Scenarios Flowchart</title>
 
-<!-- Google tag -->
+<!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-8W1VHEV9FE"></script>
 <script>
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', 'G-8W1VHEV9FE');
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-8W1VHEV9FE');
 </script>
 
 <!-- MathJax -->
@@ -23,155 +24,176 @@ window.MathJax = {
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 
 <style>
-body{
-  font-family: Arial, sans-serif;
-  margin:40px;
-  background:#f3f4f6;
-  color:#111827;
-}
-h1{text-align:center;margin-bottom:6px;}
-p.sub{text-align:center;color:#374151;margin-bottom:20px;}
+  body{
+    font-family: Arial, sans-serif;
+    margin:40px;
+    background:#f3f4f6;
+    color:#111827;
+  }
+  h1{text-align:center;margin-bottom:6px;}
+  p.sub{text-align:center;color:#374151;margin-bottom:20px;}
 
-.wrap{
-  max-width:1050px;
-  margin:auto;
-  background:white;
-  border-radius:14px;
-  padding:20px;
-  box-shadow:0 8px 20px rgba(0,0,0,0.08);
-}
+  .wrap{
+    max-width:1050px;
+    margin:auto;
+    background:white;
+    border-radius:14px;
+    padding:20px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.08);
+  }
 
-.flow{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:16px;
-}
+  .flow{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:16px;
+  }
 
-.node{
-  background:#2563eb;
-  color:white;
-  padding:14px 18px;
-  border-radius:12px;
-  font-weight:800;
-  font-size:1.3rem;
-}
+  .node{
+    background:#2563eb;
+    color:white;
+    padding:14px 18px;
+    border-radius:12px;
+    font-weight:800;
+    font-size:1.3rem;
+  }
 
-.stem{
-  width:4px;
-  height:24px;
-  background:#93c5fd;
-  border-radius:999px;
-}
+  .stem{
+    width:4px;
+    height:24px;
+    background:#93c5fd;
+    border-radius:999px;
+  }
 
-.bus{
-  height:4px;
-  width:90%;
-  background:#93c5fd;
-  border-radius:999px;
-  position:relative;
-}
-.bus .drop{
-  position:absolute;
-  width:4px;
-  height:18px;
-  background:#93c5fd;
-  border-radius:999px;
-  transform:translateX(-50%);
-}
-.bus .left{left:16.6%;}
-.bus .mid{left:50%;}
-.bus .right{left:83.3%;}
+  .bus{
+    height:4px;
+    width:90%;
+    background:#93c5fd;
+    border-radius:999px;
+    position:relative;
+  }
+  .bus .drop{
+    position:absolute;
+    width:4px;
+    height:18px;
+    background:#93c5fd;
+    border-radius:999px;
+    transform:translateX(-50%);
+  }
+  .bus .left{left:16.6%;}
+  .bus .mid{left:50%;}
+  .bus .right{left:83.3%;}
 
-.branchRow{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:18px;
-  width:100%;
-}
+  .branchRow{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:18px;
+    width:100%;
+  }
 
-.card{
-  background:#1d4ed8;
-  color:white;
-  border-radius:14px;
-  padding:16px;
-  box-shadow:0 6px 14px rgba(0,0,0,0.1);
-  cursor:pointer;
-  transition:0.15s ease;
-  position:relative;
-  overflow:hidden;
-}
-.card:hover{
-  transform:translateY(-3px);
-  box-shadow:0 10px 20px rgba(0,0,0,0.14);
-}
+  .card{
+    background:#1d4ed8;
+    color:white;
+    border-radius:14px;
+    padding:16px;
+    box-shadow:0 6px 14px rgba(0,0,0,0.1);
+    cursor:pointer;
+    transition:0.15s ease;
+    position:relative;
+    overflow:hidden;
+  }
+  .card:hover{
+    transform:translateY(-3px);
+    box-shadow:0 10px 20px rgba(0,0,0,0.14);
+  }
 
-.title{
-  font-weight:800;
-  margin-bottom:10px;
-}
+  .title{
+    font-weight:800;
+    margin-bottom:10px;
+  }
 
-.eq{
-  background:rgba(255,255,255,0.12);
-  border-radius:10px;
-  padding:10px;
-  margin-bottom:10px;
-  line-height:1.35;
-}
+  .eq{
+    background:rgba(255,255,255,0.12);
+    border-radius:10px;
+    padding:10px;
+    margin-bottom:10px;
+    line-height:1.35;
+  }
 
-.vars{
-  margin-top:8px;
-  font-size:0.90rem;
-}
+  .vars{
+    margin-top:8px;
+    font-size:0.90rem;
+    opacity:0.95;
+  }
+  .vars .lbl{
+    font-weight:800;
+    margin-bottom:4px;
+    display:block;
+  }
+  .vars ul{
+    margin:6px 0 0 18px;
+    padding:0;
+  }
 
-.imgBox{
-  background:rgba(255,255,255,0.10);
-  border:1px solid rgba(255,255,255,0.16);
-  border-radius:10px;
-  padding:8px;
-  margin-bottom:10px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  height:200px; /* bigger images */
-}
+  .imgBox{
+    background:rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius:10px;
+    padding:8px;
+    margin-bottom:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    height:110px;
+  }
 
-.imgBox img{
-  width:100%;
-  height:100%;
-  object-fit:contain;
-  border-radius:8px;
-}
+  .imgBox img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    border-radius:8px;
+  }
 
-.tip{
-  position:absolute;
-  bottom:12px;
-  left:12px;
-  right:12px;
-  background:white;
-  color:#111827;
-  padding:10px;
-  border-radius:10px;
-  opacity:0;
-  transform:translateY(6px);
-  transition:0.15s ease;
-  font-size:0.9rem;
-}
-.card:hover .tip{opacity:1;transform:translateY(0);}
+  .examples{
+    display:none;
+    background:rgba(255,255,255,0.15);
+    border-radius:10px;
+    padding:10px;
+    font-size:0.92rem;
+    margin-top:8px;
+    line-height:1.35;
+  }
 
-@media(max-width:900px){
-  .branchRow{grid-template-columns:1fr;}
-  .bus,.stem{display:none;}
-}
+  .tip{
+    position:absolute;
+    bottom:12px;
+    left:12px;
+    right:12px;
+    background:white;
+    color:#111827;
+    padding:10px;
+    border-radius:10px;
+    opacity:0;
+    transform:translateY(6px);
+    transition:0.15s ease;
+    font-size:0.9rem;
+    pointer-events:none;
+  }
+  .card:hover .tip{opacity:1;transform:translateY(0);}
 
-a.back{
-  display:block;
-  text-align:center;
-  margin-top:18px;
-  color:#4f46e5;
-  text-decoration:none;
-}
-a.back:hover{ text-decoration:underline; }
+  @media(max-width:900px){
+    .branchRow{grid-template-columns:1fr;}
+    .bus,.stem{display:none;}
+  }
+
+  a.back{
+    display:block;
+    text-align:center;
+    margin-top:18px;
+    color:#4f46e5;
+    text-decoration:none;
+  }
+  a.back:hover{ text-decoration:underline; }
 </style>
 </head>
 
@@ -181,67 +203,111 @@ a.back:hover{ text-decoration:underline; }
 <p class="sub">Hover for quick meaning. Click a card to view a solved example.</p>
 
 <div class="wrap">
-<div class="flow">
+  <div class="flow">
+    <div class="node">Failure</div>
+    <div class="stem"></div>
 
-<div class="node">Failure</div>
-<div class="stem"></div>
+    <div class="bus">
+      <div class="drop left"></div>
+      <div class="drop mid"></div>
+      <div class="drop right"></div>
+    </div>
 
-<div class="bus">
-<div class="drop left"></div>
-<div class="drop mid"></div>
-<div class="drop right"></div>
-</div>
+    <div class="branchRow">
 
-<div class="branchRow">
+      <!-- STATIC + FLAW -->
+      <div class="card" onclick="location.href='static_flaw.html'">
+        <div class="title">Static-loading + flaw</div>
 
-<!-- STATIC -->
-<div class="card" onclick="location.href='static_flaw.html'">
-<div class="title">Static-loading + flaw</div>
+        <div class="imgBox">
+          <img src="images/static-loading.png" alt="Static loading with flaw">
+        </div>
 
-<div class="imgBox">
-<img src="images/static loading.png" alt="Static loading with flaw">
-</div>
+        <div class="eq">
+          <div>\( K = f\,\sigma\,\sqrt{\pi a} \)</div>
+          <div style="margin-top:6px;">Failure if \(K \ge K_{IC}\)</div>
 
-<div class="eq">
-\( K = f\sigma\sqrt{\pi a} \)<br>
-Failure if \(K \ge K_{IC}\)
-</div>
+          <div class="vars">
+            <span class="lbl">Variables</span>
+            <ul>
+              <li>\(K\): stress intensity factor (Mode I here)</li>
+              <li>\(\sigma\): applied (nominal) stress</li>
+              <li>\(a\): crack size parameter</li>
+              <li>\(f\): geometry factor</li>
+              <li>\(K_{IC}\): plane-strain fracture toughness</li>
+            </ul>
+            <div style="margin-top:8px;">
+              <b>\(a\) vs \(2a\):</b> Center crack is often labeled total length \(2a\) 
+              so \(a\) is half-length. Edge cracks are usually just labeled \(a\) from the edge inward.
+              Keep your \(a\) definition consistent with \(f\).
+            </div>
+          </div>
+        </div>
 
-<div class="tip">One-time loading where a flaw controls failure</div>
-</div>
+        <div class="tip"><b>When to use</b><br>One-time/slow loading where a flaw controls immediate failure.</div>
+      </div>
 
-<!-- FATIGUE -->
-<div class="card" onclick="location.href='fatigue_no_flaw.html'">
-<div class="title">Fatigue (no flaw)</div>
+      <!-- FATIGUE (NO FLAW) -->
+      <div class="card" onclick="location.href='fatigue_no_flaw.html'">
+        <div class="title">Fatigue (no flaw)</div>
 
-<div class="imgBox">
-<img src="images/fatigue-no-flaw.png" alt="Fatigue without flaw">
-</div>
+        <div class="imgBox">
+          <img src="images/fatigue-no-flaw.png" alt="Fatigue without flaw">
+        </div>
 
-<div class="eq">
-Use S–N curve with \(\sigma_a\) vs \(N\)
-</div>
+        <div class="eq">
+          <div><b>S–N / endurance approach</b></div>
+          <div style="margin-top:6px;">Use stress amplitude \(\sigma_a\) vs cycles to failure \(N\)</div>
 
-<div class="tip">Cyclic loading without initial crack</div>
-</div>
+          <div class="vars">
+            <span class="lbl">Common variables</span>
+            <ul>
+              <li>\(\sigma_{max}, \sigma_{min}\): max/min stress in a cycle</li>
+              <li>\(\sigma_a = (\sigma_{max}-\sigma_{min})/2\): stress amplitude</li>
+              <li>\(\sigma_m = (\sigma_{max}+\sigma_{min})/2\): mean stress</li>
+              <li>\(R = \sigma_{min}/\sigma_{max}\): stress ratio</li>
+              <li>\(N\): cycles to failure</li>
+            </ul>
+          </div>
+        </div>
 
-<!-- FATIGUE + FLAW -->
-<div class="card" onclick="location.href='fatigue_flaw.html'">
-<div class="title">Fatigue + flaw</div>
+        <div class="tip"><b>When to use</b><br>Cyclic loading when you assume no dominant pre-existing crack.</div>
+      </div>
 
-<div class="imgBox">
-<img src="images/fatigue-flaw.png" alt="Fatigue with flaw">
-</div>
+      <!-- FATIGUE + FLAW -->
+      <div class="card" onclick="location.href='fatigue_flaw.html'">
+        <div class="title">Fatigue + flaw</div>
 
-<div class="eq">
-\( \frac{da}{dN} = C(\Delta K)^n \)
-</div>
+        <div class="imgBox">
+          <img src="images/fatigue-flaw.png" alt="Fatigue with flaw">
+        </div>
 
-<div class="tip">Crack growth under cyclic loading</div>
-</div>
+        <div class="eq">
+          <div>\( \dfrac{da}{dN} = C(\Delta K)^n \)</div>
+          <div style="margin-top:6px;">\( \Delta K = f(\sigma_{max}-\sigma_{min})\sqrt{\pi a} \)</div>
 
-</div>
-</div>
+          <div class="vars">
+            <span class="lbl">Variables</span>
+            <ul>
+              <li>\(a\): crack size parameter</li>
+              <li>\(N\): number of cycles</li>
+              <li>\(\frac{da}{dN}\): crack growth per cycle</li>
+              <li>\(\Delta K\): range of stress intensity in a cycle</li>
+              <li>\(C, n\): Paris-law material constants</li>
+              <li>\(f\): geometry factor</li>
+            </ul>
+            <div style="margin-top:8px;">
+              <b>\(a\) vs \(2a\):</b> For a center crack, many texts label total length \(2a\). 
+              For an edge crack, length is usually \(a\).
+            </div>
+          </div>
+        </div>
+
+        <div class="tip"><b>When to use</b><br>Cyclic loading with a known crack/flaw that grows with cycles.</div>
+      </div>
+
+    </div>
+  </div>
 </div>
 
 <a class="back" href="index.html">← Back to Home</a>
